@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\ArtistController;
 use App\Http\Controllers\Auth\SessionController;
 use App\Http\Controllers\Auth\SocialiteController;
+use App\Http\Controllers\ChartController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SearchController;
@@ -12,6 +13,12 @@ use App\Http\Controllers\VoteController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
+
+Route::redirect('/charts', '/charts/daily');
+Route::get('/charts/daily', [ChartController::class, 'daily'])->name('charts.daily');
+Route::get('/charts/{date}', [ChartController::class, 'daily'])
+    ->where('date', '\d{4}-\d{2}-\d{2}')
+    ->name('charts.date');
 
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 

@@ -9,6 +9,21 @@
         </p>
     </div>
 
+    @if ($topTen && $topTen->entries->isNotEmpty())
+        <div class="mx-auto max-w-3xl px-4 pb-16 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-white">Current Top 10</h2>
+                <a href="{{ route('charts.daily') }}" class="text-sm text-neutral-400 hover:text-white">Full chart →</a>
+            </div>
+
+            <div class="mt-4 space-y-2">
+                @foreach ($topTen->entries as $entry)
+                    <x-chart-row :entry="$entry" :has-voted="$votedSongIds->contains($entry->song_id)" />
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     <div class="mx-auto max-w-6xl px-4 pb-16 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between">
             <h2 class="text-lg font-semibold text-white">Recently Added</h2>

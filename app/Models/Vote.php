@@ -36,7 +36,7 @@ class Vote extends Model
     protected function casts(): array
     {
         return [
-            'vote_date' => 'date',
+            'vote_date' => 'date:Y-m-d',
         ];
     }
 }

@@ -56,7 +56,7 @@ class Song extends Model
     protected function casts(): array
     {
         return [
-            'release_date' => 'date',
+            'release_date' => 'date:Y-m-d',
             'is_active' => 'boolean',
             'voting_enabled' => 'boolean',
         ];

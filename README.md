@@ -21,8 +21,9 @@ This repository currently implements:
 * **Phase 3 — Public Catalog**: homepage, artist/genre/song pages, search.
 * **Phase 4 — Authentication**: Facebook sign-in via Laravel Socialite.
 * **Phase 5 — Voting**: one vote per user per song per day, enforced by a database unique constraint.
+* **Phase 6 — Chart Engine**: daily chart generation, ranking, movement, peak rank, chart history.
 
-The chart/ranking engine and YouTube playback land in later phases and are not yet implemented.
+YouTube playback and admin CRUD land in later phases and are not yet implemented.
 
 ## Technology Stack
 
@@ -157,8 +158,29 @@ concurrent double-submits can never create two valid votes; the `App\Actions\Vot
 catches the resulting unique-constraint violation and reports it as "already voted" instead of
 erroring. Votes are also rate-limited per user (`votes` limiter, 20/minute) via `throttle:votes`.
 
-There is no chart/ranking engine yet (Phase 6), so the song page currently shows only today's raw
-vote count, not a chart position.
+## Chart Generation
+
+```bash
+docker compose exec app php artisan charts:generate-daily [date]
+```
+
+Tallies votes for `date` (defaults to yesterday, since the chart for "today" reflects a completed
+prior day of voting) and snapshots a `Chart` + ordered `ChartEntry` rows. All ranking/tie-break logic
+lives in `App\Actions\Charts\CalculateChartRanking` — never duplicate it in a controller, view, or
+ad-hoc query. Ranking:
+
+1. Vote count, descending.
+2. Ties: earlier time the final vote total was reached.
+3. Ties: better previous-day chart rank.
+4. Ties: stable song ID, for full determinism.
+
+Generation is idempotent (rerunning for the same date replaces that chart's entries rather than
+duplicating them), transactional (a partial chart is never exposed), and guarded by a cache lock so
+overlapping scheduler runs can't double-generate. It only ranks songs whose song *and* artist are
+currently active. The scheduler runs it daily at 00:15 (`routes/console.php`).
+
+Only daily charts are implemented; `chart_type` supports `weekly` in the schema for a future addition,
+but weekly generation doesn't exist yet.
 
 ## Testing
 

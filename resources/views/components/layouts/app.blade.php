@@ -32,6 +32,7 @@
                 </form>
 
                 <div class="flex items-center gap-6 text-sm font-medium text-neutral-300">
+                    <a href="{{ route('charts.daily') }}" class="hover:text-white">Charts</a>
                     <a href="{{ route('artists.index') }}" class="hover:text-white">Artists</a>
                     <a href="{{ route('genres.index') }}" class="hover:text-white">Genres</a>
 
