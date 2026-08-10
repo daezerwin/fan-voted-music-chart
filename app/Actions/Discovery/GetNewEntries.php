@@ -2,13 +2,14 @@
 
 namespace App\Actions\Discovery;
 
-use App\Enums\ChartType;
-use App\Models\Chart;
+use App\Actions\Charts\GetLatestDailyChart;
 use App\Models\ChartEntry;
 use Illuminate\Support\Collection;
 
 class GetNewEntries
 {
+    public function __construct(private readonly GetLatestDailyChart $latestDailyChart) {}
+
     /**
      * Entries from the latest daily chart that weren't on the previous
      * chart — covers both brand-new entries and re-entries.
@@ -17,7 +18,7 @@ class GetNewEntries
      */
     public function __invoke(?int $genreId = null, int $limit = 5): Collection
     {
-        $chart = Chart::query()->where('chart_type', ChartType::Daily)->latest('chart_date')->first();
+        $chart = ($this->latestDailyChart)();
 
         if ($chart === null) {
             return collect();

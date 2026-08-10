@@ -26,5 +26,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::before(fn (User $user) => $user->isAdmin() ?: null);
 
         RateLimiter::for('votes', fn ($request) => Limit::perMinute(20)->by($request->user()->id));
+
+        RateLimiter::for('auth', fn ($request) => Limit::perMinute(15)->by($request->ip()));
     }
 }

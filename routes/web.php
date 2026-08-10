@@ -13,12 +13,15 @@ use App\Http\Controllers\ChartController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SongController;
 use App\Http\Controllers\TopTenPlayerController;
 use App\Http\Controllers\VoteController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
+
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 Route::redirect('/charts', '/charts/daily');
 Route::get('/charts/daily', [ChartController::class, 'daily'])->name('charts.daily');
@@ -52,10 +55,12 @@ Route::post('/logout', [SessionController::class, 'destroy'])
 
 Route::get('/auth/{provider}/redirect', [SocialiteController::class, 'redirect'])
     ->whereIn('provider', SocialiteController::SUPPORTED_PROVIDERS)
+    ->middleware('throttle:auth')
     ->name('auth.redirect');
 
 Route::get('/auth/{provider}/callback', [SocialiteController::class, 'callback'])
     ->whereIn('provider', SocialiteController::SUPPORTED_PROVIDERS)
+    ->middleware('throttle:auth')
     ->name('auth.callback');
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {

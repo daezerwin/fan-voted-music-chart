@@ -57,7 +57,7 @@ class DiscoveryHighlightsTest extends TestCase
         ChartEntry::factory()->create(['chart_id' => $chart->id, 'song_id' => $faller->id, 'movement' => -3]);
         ChartEntry::factory()->create(['chart_id' => $chart->id, 'song_id' => $steady->id, 'movement' => 0]);
 
-        $gainers = (new GetBiggestGainers)();
+        $gainers = app(GetBiggestGainers::class)();
 
         $this->assertCount(1, $gainers);
         $this->assertSame($riser->id, $gainers->first()->song_id);
@@ -72,7 +72,7 @@ class DiscoveryHighlightsTest extends TestCase
         ChartEntry::factory()->create(['chart_id' => $chart->id, 'song_id' => $newSong->id, 'previous_rank' => null, 'rank' => 1]);
         ChartEntry::factory()->create(['chart_id' => $chart->id, 'song_id' => $returningSong->id, 'previous_rank' => 4, 'rank' => 2]);
 
-        $entries = (new GetNewEntries)();
+        $entries = app(GetNewEntries::class)();
 
         $this->assertCount(1, $entries);
         $this->assertSame($newSong->id, $entries->first()->song_id);

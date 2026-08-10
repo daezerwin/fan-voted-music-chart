@@ -1,4 +1,9 @@
-<x-layouts.app :title="$artist->name.' — '.config('app.name')" :description="Str::limit(strip_tags((string) $artist->bio), 155)">
+<x-layouts.app
+    :title="$artist->name.' — '.config('app.name')"
+    :description="Str::limit(strip_tags((string) $artist->bio), 155)"
+    :image="$artist->image"
+    og-type="profile"
+>
     <div class="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
         <div class="flex flex-col gap-6 sm:flex-row sm:items-start">
             <div class="h-32 w-32 shrink-0 overflow-hidden rounded-lg bg-neutral-800">

@@ -4,8 +4,8 @@ namespace App\Console\Commands;
 
 use App\Actions\Charts\GenerateDailyChart;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -21,14 +21,6 @@ class GenerateDailyChartCommand extends Command
             ? Carbon::parse($this->argument('date'))
             : now()->subDay();
 
-        $lock = Cache::lock('charts:generate-daily:'.$date->toDateString(), 300);
-
-        if (! $lock->get()) {
-            $this->warn("Chart generation for {$date->toDateString()} is already running.");
-
-            return self::SUCCESS;
-        }
-
         try {
             Log::info('Generating daily chart.', ['date' => $date->toDateString()]);
 
@@ -42,6 +34,10 @@ class GenerateDailyChartCommand extends Command
             $this->info("Daily chart generated for {$date->toDateString()}.");
 
             return self::SUCCESS;
+        } catch (LockTimeoutException) {
+            $this->warn("Chart generation for {$date->toDateString()} is already running elsewhere; not waiting further.");
+
+            return self::SUCCESS;
         } catch (Throwable $e) {
             Log::error('Daily chart generation failed.', [
                 'date' => $date->toDateString(),
@@ -51,8 +47,6 @@ class GenerateDailyChartCommand extends Command
             $this->error("Chart generation failed: {$e->getMessage()}");
 
             return self::FAILURE;
-        } finally {
-            $lock->release();
         }
     }
 }

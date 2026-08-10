@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Charts\GetLatestDailyChart;
 use App\Actions\Discovery\GetBiggestGainers;
 use App\Actions\Discovery\GetNewEntries;
 use App\Actions\Discovery\GetTrendingSongs;
-use App\Enums\ChartType;
 use App\Models\Artist;
-use App\Models\Chart;
 use App\Models\Song;
 use App\Models\Vote;
 use Illuminate\Contracts\View\View;
@@ -16,14 +15,12 @@ use Illuminate\Support\Facades\Auth;
 class HomeController extends Controller
 {
     public function __invoke(
+        GetLatestDailyChart $latestDailyChart,
         GetTrendingSongs $trendingSongs,
         GetBiggestGainers $biggestGainers,
         GetNewEntries $newEntries,
     ): View {
-        $topTen = Chart::query()
-            ->where('chart_type', ChartType::Daily)
-            ->latest('chart_date')
-            ->first();
+        $topTen = $latestDailyChart();
 
         $topTen?->load([
             'entries' => fn ($entries) => $entries->orderBy('rank')->limit(10),

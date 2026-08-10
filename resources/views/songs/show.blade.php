@@ -1,4 +1,9 @@
-<x-layouts.app :title="$song->title.' — '.$song->artist->name" :description="Str::limit(strip_tags((string) $song->description), 155)">
+<x-layouts.app
+    :title="$song->title.' — '.$song->artist->name"
+    :description="Str::limit(strip_tags((string) $song->description), 155)"
+    :image="$song->cover_image"
+    og-type="music.song"
+>
     <div class="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
         @if (session('status'))
             <p class="mb-6 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">

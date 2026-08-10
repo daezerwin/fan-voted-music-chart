@@ -28,10 +28,12 @@ This repository currently implements:
 * **Phase 10 — Infrastructure & Deployment**: paired app/web GHCR images, a Portainer-ready production
   Compose stack, and CI → Docker → Deploy workflows (deploy is safe-by-default/manual until explicitly
   enabled — see "Production Deployment").
+* **Phase 11 — Production Hardening**: a review pass across caching, concurrency, security, SEO, and
+  accessibility — see "Production Hardening Review" for exactly what changed and what's deliberately
+  deferred.
 
-Phase 11 (a dedicated production-hardening review pass) hasn't happened yet. Phase 12 (monetization) is
-deliberately not built — the spec itself defers it "until product usage warrants it," and this app has
-no real users yet.
+Phase 12 (monetization) is deliberately not built — the spec itself defers it "until product usage
+warrants it," and this app has no real users yet.
 
 ## Technology Stack
 
@@ -165,7 +167,9 @@ UTC — set it to your target market's timezone, e.g. `Asia/Manila`). Duplicate 
 by a database unique constraint on `(user_id, song_id, vote_date)`, not a check-then-insert, so
 concurrent double-submits can never create two valid votes; the `App\Actions\Voting\CastVote` action
 catches the resulting unique-constraint violation and reports it as "already voted" instead of
-erroring. Votes are also rate-limited per user (`votes` limiter, 20/minute) via `throttle:votes`.
+erroring. Votes are also rate-limited per user (`votes` limiter, 20/minute) via `throttle:votes`. Each
+vote records the casting IP address for audit visibility (see "Admin" and "Production Hardening
+Review") — it's never used to block or throttle a vote by itself.
 
 ## Chart Generation
 
@@ -228,9 +232,11 @@ route middleware plus a `Gate::before` that grants admins every ability. Availab
   (for songs) `voting_enabled` toggles. Deleting an artist or song is intentionally not exposed —
   deactivate instead, since both have a `restrictOnDelete` foreign key once they're chart/vote history.
   Genres can be deleted, but the database rejects it while any song still references them.
-* **Votes** (`/admin/votes`) — a per-day view of vote counts by user and a recent-votes feed. This is
-  visibility only; there's no automated fraud scoring or flagging yet (that's real Phase 11 anti-abuse
-  work), so it's a starting point for a human to notice unusual vote velocity, not a moderation tool.
+* **Votes** (`/admin/votes`) — a per-day view of vote counts by user, IPs shared by more than one
+  account, and a recent-votes feed (with IP). This is visibility only; there's no automated fraud
+  scoring or flagging, so it's a starting point for a human to notice unusual patterns, not a
+  moderation tool — shared IPs in particular are normal (households, NAT, campus networks) and aren't
+  evidence of abuse by themselves.
 * **Charts** (`/admin/charts`) — manually regenerate a specific date's chart snapshot; useful after a
   correction (e.g. deactivating a song) that should be reflected retroactively.
 * **Dashboard** — basic counts (users, active artists/songs, genres, votes today).
@@ -373,6 +379,53 @@ Portainer stack's `APP_IMAGE_TAG` variable to the previous known-good SHA and re
 no rebuild required. Run `php artisan migrate:status` after rolling back if the previous deploy
 included a migration; a schema rollback is a separate, deliberate decision the tooling here doesn't
 automate.
+
+## Production Hardening Review
+
+A deliberate pass across the spec's hardening checklist. What changed, and why:
+
+* **Caching** — `App\Actions\Charts\GetLatestDailyChart` (the "what's the current chart" lookup hit by
+  the homepage, the chart page, and all three discovery sections) is now cached for an hour and
+  explicitly invalidated inside `GenerateDailyChart` the moment a new chart is generated — never left
+  to expire stale. Nothing else is cached yet; the rest of the app is cheap enough not to need it.
+* **Concurrency correctness (a real bug, not just a checklist item)** — chart-generation locking used
+  to live only in the `charts:generate-daily` Artisan command. The admin "regenerate" tool calls
+  `GenerateDailyChart` directly, bypassing the command entirely, so it was completely unprotected
+  against racing the scheduled run. Moved the lock into the action itself (`Cache::lock(...)->block(3, ...)`)
+  so every call path — scheduled, manual command, or admin-triggered — serializes correctly instead of
+  racing. See `App\Actions\Charts\GenerateDailyChart`.
+* **SEO** — added Open Graph/Twitter Card meta tags (layout-level, with a per-page `:image` prop used by
+  song/artist pages), `/sitemap.xml` (dynamic, cached, covers active artists/songs/genres), and pointed
+  `robots.txt` at it.
+* **Accessibility** — a global `:focus-visible` outline for every interactive element (previously only
+  a few components had hand-added focus styles) and `prefers-reduced-motion` support.
+* **Security** — added a `throttle:auth` rate limit (15/min/IP) to the Facebook redirect/callback routes
+  as defense-in-depth. Reviewed for the usual suspects (mass assignment, XSS, SQL injection, open
+  redirects, session fixation, sensitive logging) — nothing new found; see "Security" below for what's
+  already in place from earlier phases.
+* **Abuse prevention** — votes now record the casting IP (`votes.ip_address`, nullable, audit-only —
+  it never blocks or throttles a vote by itself). The admin voting-activity page surfaces IPs used by
+  more than one account on a given day, explicitly framed as a prompt for human review, not evidence of
+  abuse (shared IPs are normal — households, NAT, campus networks).
+* **Queue reliability** — already adequate: `failed_jobs`/`job_batches` tables exist, `queue:work` runs
+  with `--tries=3`. Nothing in the app dispatches a queued job yet (votes are synchronous by design;
+  YouTube metadata refresh and notifications are unbuilt), so there's nothing further to harden here
+  until a real job exists.
+* **Scheduler reliability** — already adequate: `withoutOverlapping()` at the schedule level plus the
+  action-level lock above.
+
+Deliberately **not** addressed here, because they need a real decision or real infrastructure this
+environment doesn't have, not more code:
+
+* **Backups** — a hosting/ops decision (which managed MySQL backup solution, retention policy), not
+  something to fake-implement. Document the chosen approach once the production host is finalized.
+* **Monitoring** — needs a real APM/error-tracking choice (Sentry, etc.) and credentials.
+* **Privacy** — no account-deletion/data-export flow exists. Not building it speculatively; revisit if
+  a real jurisdiction's requirements (GDPR/CCPA) apply once there are real users.
+* **Full anti-fraud scoring** — the spec explicitly prefers "risk scoring and moderation over simplistic
+  blocking" and warns never to reveal fraud thresholds publicly. Building a real one needs real vote
+  patterns to calibrate against; today's daily-unique-vote constraint plus IP visibility (above) is the
+  honest, non-theatrical state of anti-abuse for a pre-launch product.
 
 ## Troubleshooting
 

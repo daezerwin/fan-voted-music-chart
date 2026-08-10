@@ -6,6 +6,7 @@ use App\Enums\ChartType;
 use App\Models\Chart;
 use App\Models\ChartEntry;
 use Carbon\CarbonInterface;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class GenerateDailyChart
@@ -17,29 +18,40 @@ class GenerateDailyChart
      * Runs inside a transaction so a partially generated chart is never
      * exposed, and is safe to rerun for the same date: existing entries for
      * that chart are replaced rather than duplicated.
+     *
+     * Guarded by a distributed lock keyed on the date, not just called from
+     * the scheduled command: this action is also invoked directly by the
+     * admin's manual "regenerate" tool, which a scheduler-level
+     * withoutOverlapping() guard would never see. Concurrent callers for the
+     * same date queue up and run in turn rather than racing each other.
      */
     public function __invoke(CarbonInterface $date): Chart
     {
-        return DB::transaction(function () use ($date) {
-            $chart = Chart::query()->updateOrCreate(
-                ['chart_type' => ChartType::Daily, 'chart_date' => $date->toDateString()],
-                ['generated_at' => now()],
-            );
+        return Cache::lock('charts:generate:daily:'.$date->toDateString(), 300)
+            ->block(3, function () use ($date) {
+                return DB::transaction(function () use ($date) {
+                    $chart = Chart::query()->updateOrCreate(
+                        ['chart_type' => ChartType::Daily, 'chart_date' => $date->toDateString()],
+                        ['generated_at' => now()],
+                    );
 
-            $chart->entries()->delete();
+                    $chart->entries()->delete();
 
-            $ranked = ($this->ranking)($date, ChartType::Daily);
+                    $ranked = ($this->ranking)($date, ChartType::Daily);
 
-            if ($ranked->isNotEmpty()) {
-                $history = $this->historicalStats($ranked->pluck('song_id')->all());
+                    if ($ranked->isNotEmpty()) {
+                        $history = $this->historicalStats($ranked->pluck('song_id')->all());
 
-                ChartEntry::query()->insert(
-                    $ranked->map(fn (array $entry) => $this->buildRow($chart->id, $entry, $history))->all()
-                );
-            }
+                        ChartEntry::query()->insert(
+                            $ranked->map(fn (array $entry) => $this->buildRow($chart->id, $entry, $history))->all()
+                        );
+                    }
 
-            return $chart;
-        });
+                    Cache::forget('charts:daily:latest');
+
+                    return $chart;
+                });
+            });
     }
 
     /**

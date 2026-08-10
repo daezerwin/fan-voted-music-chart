@@ -34,10 +34,21 @@ class VoteController extends Controller
             ->limit(50)
             ->get();
 
+        $sharedIps = Vote::query()
+            ->selectRaw('ip_address, COUNT(DISTINCT user_id) as account_count')
+            ->where('vote_date', $date)
+            ->whereNotNull('ip_address')
+            ->groupBy('ip_address')
+            ->havingRaw('COUNT(DISTINCT user_id) > 1')
+            ->orderByDesc('account_count')
+            ->limit(20)
+            ->get();
+
         return view('admin.votes.index', [
             'date' => $date,
             'topVoters' => $topVoters,
             'recentVotes' => $recentVotes,
+            'sharedIps' => $sharedIps,
         ]);
     }
 }

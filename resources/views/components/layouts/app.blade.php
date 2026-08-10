@@ -5,9 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $title ?? config('app.name') }}</title>
-    <meta name="description" content="{{ $description ?? 'An independent, community-driven music chart.' }}">
-    <link rel="canonical" href="{{ $canonical ?? url()->current() }}">
+    @php
+        $pageTitle = $title ?? config('app.name');
+        $pageDescription = $description ?? 'An independent, community-driven music chart.';
+        $pageUrl = $canonical ?? url()->current();
+    @endphp
+
+    <title>{{ $pageTitle }}</title>
+    <meta name="description" content="{{ $pageDescription }}">
+    <link rel="canonical" href="{{ $pageUrl }}">
+
+    <meta property="og:site_name" content="{{ config('app.name') }}">
+    <meta property="og:type" content="{{ $ogType ?? 'website' }}">
+    <meta property="og:title" content="{{ $pageTitle }}">
+    <meta property="og:description" content="{{ $pageDescription }}">
+    <meta property="og:url" content="{{ $pageUrl }}">
+    @isset($image)
+        <meta property="og:image" content="{{ $image }}">
+    @endisset
+
+    <meta name="twitter:card" content="{{ isset($image) ? 'summary_large_image' : 'summary' }}">
+    <meta name="twitter:title" content="{{ $pageTitle }}">
+    <meta name="twitter:description" content="{{ $pageDescription }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>

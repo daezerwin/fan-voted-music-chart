@@ -107,6 +107,16 @@ class VotingTest extends TestCase
         $response->assertStatus(429);
     }
 
+    public function test_vote_records_the_requests_ip_address(): void
+    {
+        $user = User::factory()->create();
+        $song = Song::factory()->create();
+
+        $this->actingAs($user)->post(route('votes.store', $song), [], ['REMOTE_ADDR' => '203.0.113.5']);
+
+        $this->assertSame('203.0.113.5', Vote::query()->first()->ip_address);
+    }
+
     public function test_concurrent_duplicate_votes_are_rejected_gracefully(): void
     {
         $user = User::factory()->create();

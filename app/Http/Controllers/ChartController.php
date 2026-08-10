@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Charts\GetLatestDailyChart;
 use App\Enums\ChartType;
 use App\Models\Chart;
 use App\Models\Vote;
@@ -11,13 +12,11 @@ use Illuminate\Support\Facades\Auth;
 
 class ChartController extends Controller
 {
-    public function daily(?string $date = null): View
+    public function daily(GetLatestDailyChart $latestDailyChart, ?string $date = null): View
     {
-        $query = Chart::query()->where('chart_type', ChartType::Daily);
-
         $chart = $date !== null
-            ? $query->where('chart_date', $date)->first()
-            : $query->latest('chart_date')->first();
+            ? Chart::query()->where('chart_type', ChartType::Daily)->where('chart_date', $date)->first()
+            : $latestDailyChart();
 
         abort_if($chart === null, 404);
 

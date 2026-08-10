@@ -9,8 +9,10 @@ use App\Models\ChartEntry;
 use App\Models\Song;
 use App\Models\User;
 use App\Models\Vote;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 
 class ChartGenerationTest extends TestCase
@@ -177,5 +179,37 @@ class ChartGenerationTest extends TestCase
                 ->whereDate('chart_date', $date)
                 ->exists()
         );
+    }
+
+    public function test_overlapping_generation_for_the_same_date_is_serialized_not_raced(): void
+    {
+        $date = '2026-08-10';
+        $song = Song::factory()->create();
+        $this->voteAt($song, $date, "{$date} 09:00:00");
+
+        $lock = Cache::lock('charts:generate:daily:'.$date, 300);
+        $this->assertTrue($lock->get());
+
+        try {
+            $this->expectException(LockTimeoutException::class);
+            app(GenerateDailyChart::class)(Carbon::parse($date));
+        } finally {
+            $lock->release();
+        }
+    }
+
+    public function test_command_does_not_fail_when_generation_is_already_running_elsewhere(): void
+    {
+        $date = '2026-08-10';
+
+        $lock = Cache::lock('charts:generate:daily:'.$date, 300);
+        $this->assertTrue($lock->get());
+
+        try {
+            $this->artisan('charts:generate-daily', ['date' => $date])
+                ->assertExitCode(0);
+        } finally {
+            $lock->release();
+        }
     }
 }
