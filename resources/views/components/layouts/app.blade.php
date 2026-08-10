@@ -6,6 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ $title ?? config('app.name') }}</title>
+    <meta name="description" content="{{ $description ?? 'An independent, community-driven music chart.' }}">
+    <link rel="canonical" href="{{ $canonical ?? url()->current() }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -17,8 +19,21 @@
                     {{ config('app.name') }}
                 </a>
 
+                <form action="{{ route('search') }}" method="GET" class="hidden flex-1 max-w-sm px-6 sm:block">
+                    <label for="nav-search" class="sr-only">Search artists and songs</label>
+                    <input
+                        id="nav-search"
+                        type="search"
+                        name="q"
+                        value="{{ request('q') }}"
+                        placeholder="Search artists and songs"
+                        class="w-full rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm text-white placeholder-neutral-500 focus:border-white/30 focus:outline-none"
+                    >
+                </form>
+
                 <div class="flex items-center gap-6 text-sm font-medium text-neutral-300">
-                    <a href="{{ url('/') }}" class="hover:text-white">Charts</a>
+                    <a href="{{ route('artists.index') }}" class="hover:text-white">Artists</a>
+                    <a href="{{ route('genres.index') }}" class="hover:text-white">Genres</a>
 
                     @auth
                         <span class="text-neutral-400">{{ auth()->user()->name }}</span>
