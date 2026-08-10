@@ -1,15 +1,15 @@
 # Portainer Stack file for production. Consumes prebuilt, immutable images
 # published to GHCR by .github/workflows/docker.yml — nothing is built here.
 #
+# IMAGE_REPOSITORY already defaults to ghcr.io/daezerwin/fan-voted-music-chart.
 # Required stack variables (see README "Portainer Deployment"):
-#   IMAGE_REPOSITORY  e.g. ghcr.io/your-org/music-chart
 #   APP_IMAGE_TAG     e.g. sha-abc1234 (never rely on `latest` alone)
 #   APP_PORT, DB_DATABASE, DB_USERNAME, DB_PASSWORD, REDIS_PASSWORD, etc.
 #   — plus every variable Laravel itself needs, the same as `.env`.
 
 services:
   web:
-    image: ${IMAGE_REPOSITORY:?required}-web:${APP_IMAGE_TAG:?required}
+    image: ${IMAGE_REPOSITORY:-ghcr.io/daezerwin/fan-voted-music-chart}-web:${APP_IMAGE_TAG:?required}
     restart: unless-stopped
     ports:
       - "${APP_PORT:-8080}:80"
@@ -20,7 +20,7 @@ services:
       - app-network
 
   app:
-    image: ${IMAGE_REPOSITORY:?required}:${APP_IMAGE_TAG:?required}
+    image: ${IMAGE_REPOSITORY:-ghcr.io/daezerwin/fan-voted-music-chart}:${APP_IMAGE_TAG:?required}
     restart: unless-stopped
     env_file:
       - .env
@@ -33,7 +33,7 @@ services:
       - app-network
 
   queue:
-    image: ${IMAGE_REPOSITORY:?required}:${APP_IMAGE_TAG:?required}
+    image: ${IMAGE_REPOSITORY:-ghcr.io/daezerwin/fan-voted-music-chart}:${APP_IMAGE_TAG:?required}
     restart: unless-stopped
     command: php artisan queue:work --sleep=3 --tries=3 --timeout=90
     env_file:
@@ -47,7 +47,7 @@ services:
       - app-network
 
   scheduler:
-    image: ${IMAGE_REPOSITORY:?required}:${APP_IMAGE_TAG:?required}
+    image: ${IMAGE_REPOSITORY:-ghcr.io/daezerwin/fan-voted-music-chart}:${APP_IMAGE_TAG:?required}
     restart: unless-stopped
     command: php artisan schedule:work
     env_file:

@@ -346,14 +346,20 @@ built on the server. Required stack variables:
 
 | Variable | Example | Notes |
 |---|---|---|
-| `IMAGE_REPOSITORY` | `ghcr.io/your-org/music-chart` | Without the `-web` suffix; the stack file adds it for the web image. |
+| `IMAGE_REPOSITORY` | `ghcr.io/daezerwin/fan-voted-music-chart` | Defaults to this repo's GHCR path already; override only if you fork/rename. Without the `-web` suffix — the stack file adds it for the web image. |
 | `APP_IMAGE_TAG` | `sha-abc1234` | Never `latest` alone. |
 | `APP_PORT` | `8080` | Host port for Nginx. |
 | `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` | | Also referenced by the `app`/`queue`/`scheduler` containers via `.env`. |
 | `REDIS_PASSWORD` | | Redis requires this password in production (`--requirepass`); it must match the app's `.env`. |
 
-Plus a real production `.env` (from `.env.example`) — `APP_ENV=production`, `APP_DEBUG=false`,
-a proper `APP_KEY`, `APP_URL`, and the Facebook/YouTube credentials.
+In Portainer's **Environment variables** section when creating the stack, add every variable above
+plus every key from `.env.example`, filled in for production (`APP_ENV=production`, `APP_DEBUG=false`,
+a proper `APP_KEY`, `APP_URL`, the Facebook/YouTube credentials). Portainer stores stack-level
+environment variables in a `.env` file alongside the compose file on the host, which resolves both the
+`${...}` placeholders above and the `env_file: .env` the `app`/`queue`/`scheduler` services reference —
+you don't need to hand-create anything on the host. If your Portainer version or deployment method
+doesn't do this (older versions, or deploying via `docker stack deploy` directly instead of a
+Portainer-managed stack), create `.env` manually in the stack's directory instead.
 
 If the GHCR images are private, add a registry credential in Portainer (or a `docker login` on the
 host) before deploying — otherwise the stack will fail to pull.
