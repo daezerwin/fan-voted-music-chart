@@ -48,5 +48,15 @@
                 </div>
             </div>
         </div>
+
+        <div class="mt-8 aspect-video w-full overflow-hidden rounded-lg bg-black">
+            <iframe
+                class="h-full w-full"
+                src="https://www.youtube.com/embed/{{ $song->youtube_video_id }}"
+                title="{{ $song->title }}"
+                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+            ></iframe>
+        </div>
     </div>
 </x-layouts.app>

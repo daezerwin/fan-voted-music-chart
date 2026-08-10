@@ -9,6 +9,7 @@ use App\Http\Controllers\GenreController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SongController;
+use App\Http\Controllers\TopTenPlayerController;
 use App\Http\Controllers\VoteController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +20,8 @@ Route::get('/charts/daily', [ChartController::class, 'daily'])->name('charts.dai
 Route::get('/charts/{date}', [ChartController::class, 'daily'])
     ->where('date', '\d{4}-\d{2}-\d{2}')
     ->name('charts.date');
+
+Route::get('/play', [TopTenPlayerController::class, 'show'])->name('play');
 
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 

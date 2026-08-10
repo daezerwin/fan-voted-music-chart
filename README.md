@@ -22,8 +22,9 @@ This repository currently implements:
 * **Phase 4 — Authentication**: Facebook sign-in via Laravel Socialite.
 * **Phase 5 — Voting**: one vote per user per song per day, enforced by a database unique constraint.
 * **Phase 6 — Chart Engine**: daily chart generation, ranking, movement, peak rank, chart history.
+* **Phase 7 — YouTube Playback**: embedded player on song pages, Top 10 queue player via the IFrame API.
 
-YouTube playback and admin CRUD land in later phases and are not yet implemented.
+Admin CRUD and discovery features land in later phases and are not yet implemented.
 
 ## Technology Stack
 
@@ -181,6 +182,19 @@ currently active. The scheduler runs it daily at 00:15 (`routes/console.php`).
 
 Only daily charts are implemented; `chart_type` supports `weekly` in the schema for a future addition,
 but weekly generation doesn't exist yet.
+
+## YouTube Integration
+
+Individual song pages use a standard official `<iframe>` embed (`youtube.com/embed/{video_id}`) — no
+custom API needed for a single video. `/play` plays the current Top 10 as a queue using the real
+YouTube IFrame Player API (`resources/js/top-ten-player.js`, an Alpine.js component), auto-advancing
+on `ENDED` and skipping straight to the next track on `onError` (unavailable video or embedding
+disabled) so one bad video never stalls the queue. `App\Support\Youtube\NormalizeYoutubeVideoId`
+extracts a bare video ID from watch/youtu.be/embed/shorts URLs or a raw ID, ready for the admin song
+form (Phase 8) to use so admins can paste a full URL.
+
+Site votes are independent first-party data — they are never synced to or confused with YouTube
+likes/views, and nothing here downloads video/audio or interacts with YouTube engagement features.
 
 ## Testing
 
