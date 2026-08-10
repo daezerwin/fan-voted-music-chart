@@ -1,0 +1,96 @@
+# Portainer Stack file for production. Consumes prebuilt, immutable images
+# published to GHCR by .github/workflows/docker.yml — nothing is built here.
+#
+# Required stack variables (see README "Portainer Deployment"):
+#   IMAGE_REPOSITORY  e.g. ghcr.io/your-org/music-chart
+#   APP_IMAGE_TAG     e.g. sha-abc1234 (never rely on `latest` alone)
+#   APP_PORT, DB_DATABASE, DB_USERNAME, DB_PASSWORD, REDIS_PASSWORD, etc.
+#   — plus every variable Laravel itself needs, the same as `.env`.
+
+services:
+  web:
+    image: ${IMAGE_REPOSITORY:?required}-web:${APP_IMAGE_TAG:?required}
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8080}:80"
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  app:
+    image: ${IMAGE_REPOSITORY:?required}:${APP_IMAGE_TAG:?required}
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - app-network
+
+  queue:
+    image: ${IMAGE_REPOSITORY:?required}:${APP_IMAGE_TAG:?required}
+    restart: unless-stopped
+    command: php artisan queue:work --sleep=3 --tries=3 --timeout=90
+    env_file:
+      - .env
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - app-network
+
+  scheduler:
+    image: ${IMAGE_REPOSITORY:?required}:${APP_IMAGE_TAG:?required}
+    restart: unless-stopped
+    command: php artisan schedule:work
+    env_file:
+      - .env
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - app-network
+
+  database:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:?required}
+      MYSQL_USER: ${DB_USERNAME:?required}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?required}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:?required}
+    volumes:
+      - database_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - app-network
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: --requirepass ${REDIS_PASSWORD:?required}
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  database_data:
+  redis_data:

@@ -91,8 +91,21 @@ jobs:
       - name: Copy environment file
         run: cp .env.example .env
 
-      - name: Validate Docker Compose configuration
+      - name: Validate development Docker Compose configuration
         run: docker compose config
 
-      - name: Build production image
+      - name: Validate production Docker Compose configuration
+        env:
+          IMAGE_REPOSITORY: ghcr.io/example/music-chart
+          APP_IMAGE_TAG: ci
+          DB_DATABASE: music_chart
+          DB_USERNAME: music_chart
+          DB_PASSWORD: password
+          REDIS_PASSWORD: password
+        run: docker compose -f docker-compose.prod.yml config
+
+      - name: Build production app image
         run: docker build --target production -t music-chart:ci .
+
+      - name: Build production web image
+        run: docker build --target web -t music-chart-web:ci .

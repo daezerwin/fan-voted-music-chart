@@ -50,4 +50,22 @@ RUN chown -R laravel:laravel storage bootstrap/cache
 
 USER laravel
 
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+    CMD php artisan about > /dev/null || exit 1
+
 CMD ["php-fpm"]
+
+# Nginx serves static assets directly and proxies PHP requests to the `app`
+# container over FastCGI. It needs its own copy of the whole public/
+# directory — not just the compiled assets — because `try_files`/`index`
+# resolve against files nginx can see on its own filesystem: without a real
+# index.php present, resolving "/" 404s/403s before the request ever reaches
+# the fastcgi_pass fallback, even though PHP-FPM never executes this copy.
+FROM nginx:1.27-alpine AS web
+
+COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY public /var/www/html/public
+COPY --from=frontend /app/public/build /var/www/html/public/build
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD wget --spider -q http://localhost/ || exit 1

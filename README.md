@@ -25,10 +25,13 @@ This repository currently implements:
 * **Phase 7 — YouTube Playback**: embedded player on song pages, Top 10 queue player via the IFrame API.
 * **Phase 8 — Admin**: artist/song/genre management, voting activity visibility, manual chart regeneration.
 * **Phase 9 — Discovery**: Trending Now, Biggest Gainers, and New Entries on the homepage and genre pages.
+* **Phase 10 — Infrastructure & Deployment**: paired app/web GHCR images, a Portainer-ready production
+  Compose stack, and CI → Docker → Deploy workflows (deploy is safe-by-default/manual until explicitly
+  enabled — see "Production Deployment").
 
-Phases 10–11 (production infrastructure/deployment and hardening) haven't started. Phase 12
-(monetization) is deliberately not built — the spec itself defers it "until product usage warrants it,"
-and this app has no real users yet.
+Phase 11 (a dedicated production-hardening review pass) hasn't happened yet. Phase 12 (monetization) is
+deliberately not built — the spec itself defers it "until product usage warrants it," and this app has
+no real users yet.
 
 ## Technology Stack
 
@@ -110,9 +113,10 @@ To also expose the database and Redis ports on the host (useful for GUI clients)
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 ```
 
-Production uses the `production` target instead, which installs Composer dependencies without dev
-packages, bundles compiled frontend assets, and does not require Node at runtime. See
-[agents.md](agents.md) for the planned production/Portainer deployment flow (Phase 10).
+Production uses two other targets instead: `production` (PHP-FPM — installs Composer dependencies
+without dev packages, bundles compiled frontend assets, no Node at runtime) and `web` (Nginx, with its
+own copy of `public/` plus the compiled assets, so it never depends on a shared volume or the app
+container's filesystem). See "Container Images" and "Portainer Deployment" below.
 
 ## Environment Variables
 
@@ -299,16 +303,76 @@ docker compose logs -f scheduler
 
 ## GitHub Actions
 
-`.github/workflows/ci.yml` runs on pull requests and pushes to `main`:
+Three workflows, deliberately separated so PRs never get registry credentials and a failing build can
+never reach production:
 
-* Installs PHP and Node dependencies.
-* Checks formatting with Pint.
-* Builds frontend assets.
-* Runs migrations against a MySQL service container.
-* Runs the test suite.
-* Validates `docker compose config` and builds the production Docker image.
+* **`ci.yml`** — runs on pull requests and pushes to `main`. Installs PHP/Node dependencies, checks
+  formatting with Pint, builds frontend assets, runs migrations against a MySQL service container, runs
+  the test suite, validates both `docker-compose.yml` and `docker-compose.prod.yml`, and build-only
+  (no push) both the `production` and `web` image targets.
+* **`docker.yml`** — runs only after `ci.yml` succeeds on `main` (via `workflow_run`), plus on
+  `v*.*.*` tags. Builds and pushes the `production` (app) and `web` (Nginx) images to GHCR, tagged
+  together from the same commit so they can never mismatch. Needs no repository configuration beyond
+  the automatically-provided `GITHUB_TOKEN`.
+* **`deploy.yml`** — runs after `docker.yml` succeeds. Safe by default: unless the `DEPLOY_ENABLED`
+  repository/environment variable is `"true"`, it just logs that it's skipping and prints what to
+  configure. Once enabled, it calls the `PORTAINER_WEBHOOK` secret to trigger a stack update, waits,
+  then verifies the `APP_URL` variable's `/up` endpoint — failing loudly (`::error::`) if health checks
+  don't pass after deploy, rather than silently reporting success.
 
-No image publishing or deployment workflow exists yet — that lands in Phase 10.
+## Container Images
+
+Every build produces two images from the same `Dockerfile`, both tagged from the same commit:
+
+```text
+ghcr.io/<owner>/<repo>        — production target: Laravel via PHP-FPM (also used by queue/scheduler)
+ghcr.io/<owner>/<repo>-web    — web target: Nginx + that exact commit's compiled assets
+```
+
+Tags follow `latest`, `main`, `sha-<commit>` on every push to `main`, plus semver tags (`v1.2.0`,
+`1.2`, `1`) on version tags. **Always deploy a `sha-*` tag, never bare `latest`** — the immutable SHA
+tag is what makes rollback (below) possible.
+
+## Portainer Deployment
+
+Deploy `docker-compose.prod.yml` as a Portainer Stack. It consumes prebuilt images only — nothing is
+built on the server. Required stack variables:
+
+| Variable | Example | Notes |
+|---|---|---|
+| `IMAGE_REPOSITORY` | `ghcr.io/your-org/music-chart` | Without the `-web` suffix; the stack file adds it for the web image. |
+| `APP_IMAGE_TAG` | `sha-abc1234` | Never `latest` alone. |
+| `APP_PORT` | `8080` | Host port for Nginx. |
+| `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` | | Also referenced by the `app`/`queue`/`scheduler` containers via `.env`. |
+| `REDIS_PASSWORD` | | Redis requires this password in production (`--requirepass`); it must match the app's `.env`. |
+
+Plus a real production `.env` (from `.env.example`) — `APP_ENV=production`, `APP_DEBUG=false`,
+a proper `APP_KEY`, `APP_URL`, and the Facebook/YouTube credentials.
+
+If the GHCR images are private, add a registry credential in Portainer (or a `docker login` on the
+host) before deploying — otherwise the stack will fail to pull.
+
+## Production Deployment
+
+```text
+Merge to main → CI → Docker (build + push to GHCR) → Deploy (Portainer webhook) → verify /up
+```
+
+Until `DEPLOY_ENABLED` is turned on, the flow stops after the Docker workflow: images land in GHCR and
+an operator updates the Portainer stack's `APP_IMAGE_TAG` manually. This is the spec's explicit
+"acceptable interim state" — CI validates, builds, and pushes; automating the last step is a
+deliberate, reviewable switch to flip on, not a default.
+
+`app`, `queue`, and `scheduler` always use the same `APP_IMAGE_TAG` — never update one without the
+others, or workers will run different code than the web app.
+
+## Rollback
+
+Every deployment is identifiable by its immutable `sha-<commit>` tag. To roll back, change the
+Portainer stack's `APP_IMAGE_TAG` variable to the previous known-good SHA and redeploy the stack —
+no rebuild required. Run `php artisan migrate:status` after rolling back if the previous deploy
+included a migration; a schema rollback is a separate, deliberate decision the tooling here doesn't
+automate.
 
 ## Troubleshooting
 
