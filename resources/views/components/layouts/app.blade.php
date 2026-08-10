@@ -37,6 +37,10 @@
 
                     @auth
                         <span class="text-neutral-400">{{ auth()->user()->name }}</span>
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="hover:text-white">Sign Out</button>
+                        </form>
                     @else
                         <a href="{{ route('login') }}" class="hover:text-white">Sign In</a>
                     @endauth

@@ -79,12 +79,6 @@ jobs:
         run: php artisan migrate --force
 
       - name: Run tests
-        env:
-          DB_HOST: 127.0.0.1
-          DB_DATABASE: music_chart_testing
-          DB_USERNAME: root
-          DB_PASSWORD: ""
-          REDIS_HOST: 127.0.0.1
         run: php artisan test
 
   docker:

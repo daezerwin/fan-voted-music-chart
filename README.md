@@ -14,9 +14,14 @@ README documents what is actually implemented today.
 
 ## Status
 
-This repository currently implements **Phase 1 — Project Foundation**: the Laravel application skeleton,
-Docker environment, Tailwind base layout, and CI. Domain features (artists, songs, voting, charts,
-authentication, YouTube playback) land in later phases and are not yet implemented.
+This repository currently implements:
+
+* **Phase 1 — Project Foundation**: Laravel skeleton, Docker environment, Tailwind base layout, CI.
+* **Phase 2 — Domain Foundation**: Artist/Genre/Song models, migrations, factories, seeders, admin foundation.
+* **Phase 3 — Public Catalog**: homepage, artist/genre/song pages, search.
+* **Phase 4 — Authentication**: Facebook sign-in via Laravel Socialite.
+
+Voting, the chart engine, and YouTube playback land in later phases and are not yet implemented.
 
 ## Technology Stack
 
@@ -109,7 +114,7 @@ packages, bundles compiled frontend assets, and does not require Node at runtime
 | `APP_TIMEZONE` | Timezone used to determine the voting/chart day. Configurable per deployment. |
 | `DB_*` | Database connection; defaults match the `database` service in `docker-compose.yml`. |
 | `REDIS_*` | Redis connection; defaults match the `redis` service in `docker-compose.yml`. |
-| `FACEBOOK_CLIENT_ID` / `FACEBOOK_CLIENT_SECRET` / `FACEBOOK_REDIRECT_URI` | Laravel Socialite Facebook OAuth credentials. Not yet wired up (Phase 4). |
+| `FACEBOOK_CLIENT_ID` / `FACEBOOK_CLIENT_SECRET` / `FACEBOOK_REDIRECT_URI` | Laravel Socialite Facebook OAuth credentials. See Authentication below. |
 | `YOUTUBE_API_KEY` | YouTube Data API key for metadata refresh. Not yet wired up (Phase 7). |
 | `APP_IMAGE_TAG` | Image tag deployed by production Compose/Portainer. Not used in local development. |
 
@@ -122,6 +127,25 @@ The `database` service (MySQL 8) is created automatically by Docker Compose. Run
 ```bash
 docker compose exec app php artisan migrate
 ```
+
+## Authentication
+
+Sign-in is Facebook-only via [Laravel Socialite](https://laravel.com/docs/socialite), reachable at
+`/auth/facebook/redirect` and `/auth/facebook/callback`. The provider→user mapping lives in a
+dedicated `user_identities` table (not on `users` directly) so additional providers (Google, Apple)
+can be added later without changing the user schema. If Facebook doesn't return an email, a
+placeholder (`facebook-{id}@no-email.invalid`) is stored and `email_verified_at` is left null.
+
+To enable real sign-in, create a Facebook app and set:
+
+```env
+FACEBOOK_CLIENT_ID=
+FACEBOOK_CLIENT_SECRET=
+FACEBOOK_REDIRECT_URI=http://localhost:8080/auth/facebook/callback
+```
+
+Without these, the redirect still works (it builds a valid Facebook OAuth URL) but Facebook will
+reject the sign-in attempt.
 
 ## Testing
 

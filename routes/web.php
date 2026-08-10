@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\ArtistController;
+use App\Http\Controllers\Auth\SessionController;
+use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SearchController;
@@ -23,6 +25,18 @@ Route::get('/songs/{song:slug}', [SongController::class, 'show'])->name('songs.s
 Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
+
+Route::post('/logout', [SessionController::class, 'destroy'])
+    ->middleware('auth')
+    ->name('logout');
+
+Route::get('/auth/{provider}/redirect', [SocialiteController::class, 'redirect'])
+    ->whereIn('provider', SocialiteController::SUPPORTED_PROVIDERS)
+    ->name('auth.redirect');
+
+Route::get('/auth/{provider}/callback', [SocialiteController::class, 'callback'])
+    ->whereIn('provider', SocialiteController::SUPPORTED_PROVIDERS)
+    ->name('auth.callback');
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', DashboardController::class)->name('dashboard');
