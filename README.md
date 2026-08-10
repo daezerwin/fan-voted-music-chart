@@ -20,8 +20,9 @@ This repository currently implements:
 * **Phase 2 — Domain Foundation**: Artist/Genre/Song models, migrations, factories, seeders, admin foundation.
 * **Phase 3 — Public Catalog**: homepage, artist/genre/song pages, search.
 * **Phase 4 — Authentication**: Facebook sign-in via Laravel Socialite.
+* **Phase 5 — Voting**: one vote per user per song per day, enforced by a database unique constraint.
 
-Voting, the chart engine, and YouTube playback land in later phases and are not yet implemented.
+The chart/ranking engine and YouTube playback land in later phases and are not yet implemented.
 
 ## Technology Stack
 
@@ -146,6 +147,18 @@ FACEBOOK_REDIRECT_URI=http://localhost:8080/auth/facebook/callback
 
 Without these, the redirect still works (it builds a valid Facebook OAuth URL) but Facebook will
 reject the sign-in attempt.
+
+## Voting System
+
+A signed-in user may vote once per song per calendar day, determined by `APP_TIMEZONE` (defaults to
+UTC — set it to your target market's timezone, e.g. `Asia/Manila`). Duplicate prevention is enforced
+by a database unique constraint on `(user_id, song_id, vote_date)`, not a check-then-insert, so
+concurrent double-submits can never create two valid votes; the `App\Actions\Voting\CastVote` action
+catches the resulting unique-constraint violation and reports it as "already voted" instead of
+erroring. Votes are also rate-limited per user (`votes` limiter, 20/minute) via `throttle:votes`.
+
+There is no chart/ranking engine yet (Phase 6), so the song page currently shows only today's raw
+vote count, not a chart position.
 
 ## Testing
 

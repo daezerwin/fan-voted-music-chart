@@ -25,6 +25,14 @@ class User extends Authenticatable
         return $this->hasMany(UserIdentity::class);
     }
 
+    /**
+     * @return HasMany<Vote, $this>
+     */
+    public function votes(): HasMany
+    {
+        return $this->hasMany(Vote::class);
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === UserRole::Admin;
