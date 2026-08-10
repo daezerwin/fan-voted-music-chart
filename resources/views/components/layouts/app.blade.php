@@ -23,7 +23,7 @@
                     @auth
                         <span class="text-neutral-400">{{ auth()->user()->name }}</span>
                     @else
-                        <a href="{{ url('/login') }}" class="hover:text-white">Sign In</a>
+                        <a href="{{ route('login') }}" class="hover:text-white">Sign In</a>
                     @endauth
                 </div>
             </nav>
