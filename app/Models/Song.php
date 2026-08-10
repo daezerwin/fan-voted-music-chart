@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'description',
     'is_active',
     'voting_enabled',
+    'is_featured',
 ])]
 class Song extends Model
 {
@@ -59,6 +60,7 @@ class Song extends Model
             'release_date' => 'date:Y-m-d',
             'is_active' => 'boolean',
             'voting_enabled' => 'boolean',
+            'is_featured' => 'boolean',
         ];
     }
 }

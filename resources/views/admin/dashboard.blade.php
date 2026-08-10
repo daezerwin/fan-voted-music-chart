@@ -1,8 +1,12 @@
-<x-layouts.app>
-    <div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
-        <h1 class="text-2xl font-semibold text-white">Admin</h1>
-        <p class="mt-2 text-neutral-400">
-            Artist, song, genre, and moderation management land in a later phase.
-        </p>
+<x-layouts.admin title="Dashboard">
+    <h1 class="text-2xl font-semibold text-white">Dashboard</h1>
+
+    <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+        @foreach ($stats as $label => $value)
+            <div class="rounded-lg border border-white/10 bg-white/5 p-4">
+                <p class="text-2xl font-semibold text-white">{{ number_format($value) }}</p>
+                <p class="text-sm text-neutral-500">{{ $label }}</p>
+            </div>
+        @endforeach
     </div>
-</x-layouts.app>
+</x-layouts.admin>

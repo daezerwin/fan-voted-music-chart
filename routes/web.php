@@ -1,6 +1,11 @@
 <?php
 
+use App\Http\Controllers\Admin\ArtistController as AdminArtistController;
+use App\Http\Controllers\Admin\ChartController as AdminChartController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\GenreController as AdminGenreController;
+use App\Http\Controllers\Admin\SongController as AdminSongController;
+use App\Http\Controllers\Admin\VoteController as AdminVoteController;
 use App\Http\Controllers\ArtistController;
 use App\Http\Controllers\Auth\SessionController;
 use App\Http\Controllers\Auth\SocialiteController;
@@ -55,4 +60,21 @@ Route::get('/auth/{provider}/callback', [SocialiteController::class, 'callback']
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', DashboardController::class)->name('dashboard');
+
+    Route::resource('artists', AdminArtistController::class)
+        ->except(['show', 'destroy'])
+        ->parameters(['artists' => 'artist']);
+
+    Route::resource('songs', AdminSongController::class)
+        ->except(['show', 'destroy'])
+        ->parameters(['songs' => 'song']);
+
+    Route::resource('genres', AdminGenreController::class)
+        ->except(['show'])
+        ->parameters(['genres' => 'genre']);
+
+    Route::get('votes', [AdminVoteController::class, 'index'])->name('votes.index');
+
+    Route::get('charts', [AdminChartController::class, 'index'])->name('charts.index');
+    Route::post('charts/regenerate', [AdminChartController::class, 'regenerate'])->name('charts.regenerate');
 });

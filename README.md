@@ -23,8 +23,9 @@ This repository currently implements:
 * **Phase 5 — Voting**: one vote per user per song per day, enforced by a database unique constraint.
 * **Phase 6 — Chart Engine**: daily chart generation, ranking, movement, peak rank, chart history.
 * **Phase 7 — YouTube Playback**: embedded player on song pages, Top 10 queue player via the IFrame API.
+* **Phase 8 — Admin**: artist/song/genre management, voting activity visibility, manual chart regeneration.
 
-Admin CRUD and discovery features land in later phases and are not yet implemented.
+Discovery features (trending, biggest gainers, new entries) land in Phase 9 and aren't implemented yet.
 
 ## Technology Stack
 
@@ -190,11 +191,34 @@ custom API needed for a single video. `/play` plays the current Top 10 as a queu
 YouTube IFrame Player API (`resources/js/top-ten-player.js`, an Alpine.js component), auto-advancing
 on `ENDED` and skipping straight to the next track on `onError` (unavailable video or embedding
 disabled) so one bad video never stalls the queue. `App\Support\Youtube\NormalizeYoutubeVideoId`
-extracts a bare video ID from watch/youtu.be/embed/shorts URLs or a raw ID, ready for the admin song
-form (Phase 8) to use so admins can paste a full URL.
+extracts a bare video ID from watch/youtu.be/embed/shorts URLs or a raw ID; the admin song form uses
+it so admins can paste a full URL instead of hunting for the raw ID.
 
 Site votes are independent first-party data — they are never synced to or confused with YouTube
 likes/views, and nothing here downloads video/audio or interacts with YouTube engagement features.
+
+## Admin
+
+Sign in as `admin@example.com` (seeded by `DatabaseSeeder`) to reach `/admin`, gated by the `admin`
+route middleware plus a `Gate::before` that grants admins every ability. Available today:
+
+* **Artists / Songs / Genres** — full create/edit, with `is_active` (visibility), `is_featured`, and
+  (for songs) `voting_enabled` toggles. Deleting an artist or song is intentionally not exposed —
+  deactivate instead, since both have a `restrictOnDelete` foreign key once they're chart/vote history.
+  Genres can be deleted, but the database rejects it while any song still references them.
+* **Votes** (`/admin/votes`) — a per-day view of vote counts by user and a recent-votes feed. This is
+  visibility only; there's no automated fraud scoring or flagging yet (that's real Phase 11 anti-abuse
+  work), so it's a starting point for a human to notice unusual vote velocity, not a moderation tool.
+* **Charts** (`/admin/charts`) — manually regenerate a specific date's chart snapshot; useful after a
+  correction (e.g. deactivating a song) that should be reflected retroactively.
+* **Dashboard** — basic counts (users, active artists/songs, genres, votes today).
+
+There's only one role in practice right now (`UserRole::Admin`); `moderator` exists in the schema but
+has no distinct permissions yet — introducing that split is deferred until it's actually needed, per
+the "avoid an overly complicated role/permission system" guidance. Editorial content management and
+submission moderation aren't implemented either: there's no editorial-content model in the spec's core
+domain, and users don't submit songs in this product (only admins add catalog entries), so there's
+nothing to moderate yet.
 
 ## Testing
 

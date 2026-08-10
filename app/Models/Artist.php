@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'slug', 'bio', 'image', 'country', 'website', 'is_active'])]
+#[Fillable(['name', 'slug', 'bio', 'image', 'country', 'website', 'is_active', 'is_featured'])]
 class Artist extends Model
 {
     /** @use HasFactory<ArtistFactory> */
@@ -29,6 +29,7 @@ class Artist extends Model
     {
         return [
             'is_active' => 'boolean',
+            'is_featured' => 'boolean',
         ];
     }
 }
