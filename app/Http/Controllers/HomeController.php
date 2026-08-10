@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Discovery\GetBiggestGainers;
+use App\Actions\Discovery\GetNewEntries;
+use App\Actions\Discovery\GetTrendingSongs;
 use App\Enums\ChartType;
 use App\Models\Artist;
 use App\Models\Chart;
@@ -12,8 +15,11 @@ use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
-    public function __invoke(): View
-    {
+    public function __invoke(
+        GetTrendingSongs $trendingSongs,
+        GetBiggestGainers $biggestGainers,
+        GetNewEntries $newEntries,
+    ): View {
         $topTen = Chart::query()
             ->where('chart_type', ChartType::Daily)
             ->latest('chart_date')
@@ -42,6 +48,7 @@ class HomeController extends Controller
 
         $featuredArtists = Artist::query()
             ->where('is_active', true)
+            ->orderByDesc('is_featured')
             ->inRandomOrder()
             ->limit(12)
             ->get();
@@ -51,6 +58,9 @@ class HomeController extends Controller
             'votedSongIds' => $votedSongIds,
             'recentSongs' => $recentSongs,
             'featuredArtists' => $featuredArtists,
+            'trendingSongs' => $trendingSongs(),
+            'biggestGainers' => $biggestGainers(),
+            'newEntries' => $newEntries(),
         ]);
     }
 }

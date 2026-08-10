@@ -24,8 +24,11 @@ This repository currently implements:
 * **Phase 6 — Chart Engine**: daily chart generation, ranking, movement, peak rank, chart history.
 * **Phase 7 — YouTube Playback**: embedded player on song pages, Top 10 queue player via the IFrame API.
 * **Phase 8 — Admin**: artist/song/genre management, voting activity visibility, manual chart regeneration.
+* **Phase 9 — Discovery**: Trending Now, Biggest Gainers, and New Entries on the homepage and genre pages.
 
-Discovery features (trending, biggest gainers, new entries) land in Phase 9 and aren't implemented yet.
+Phases 10–11 (production infrastructure/deployment and hardening) haven't started. Phase 12
+(monetization) is deliberately not built — the spec itself defers it "until product usage warrants it,"
+and this app has no real users yet.
 
 ## Technology Stack
 
@@ -183,6 +186,21 @@ currently active. The scheduler runs it daily at 00:15 (`routes/console.php`).
 
 Only daily charts are implemented; `chart_type` supports `weekly` in the schema for a future addition,
 but weekly generation doesn't exist yet.
+
+## Discovery
+
+Three sections on the homepage and on each genre page (`App\Actions\Discovery\*`, all optionally
+scoped to a genre):
+
+* **Trending Now** — most votes cast *today*, queried live from `votes`. Deliberately independent of
+  the official chart, which reflects a completed prior day — this is the only real-time signal on the
+  site.
+* **Biggest Gainers** — entries from the latest daily chart with the largest positive `movement`.
+* **New Entries** — entries from the latest daily chart with no `previous_rank` (covers both brand-new
+  and re-entries).
+
+All three degrade to an empty-state message when there's no data yet (e.g. a fresh install with no
+votes or no chart generated), rather than a broken or misleadingly empty-looking section.
 
 ## YouTube Integration
 

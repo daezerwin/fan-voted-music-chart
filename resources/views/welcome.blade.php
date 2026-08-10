@@ -28,6 +28,10 @@
     @endif
 
     <div class="mx-auto max-w-6xl px-4 pb-16 sm:px-6 lg:px-8">
+        @include('partials.discovery-sections')
+    </div>
+
+    <div class="mx-auto max-w-6xl px-4 pb-16 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between">
             <h2 class="text-lg font-semibold text-white">Recently Added</h2>
             <a href="{{ route('genres.index') }}" class="text-sm text-neutral-400 hover:text-white">Browse genres →</a>
