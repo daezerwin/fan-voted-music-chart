@@ -1806,15 +1806,9 @@ Do not execute production migrations during Docker image build.
 
 Image build and schema migration are separate concerns.
 
-Production deployment may run:
+Mirroring this organization's baby-tracker deployment, run migrations automatically from the `app` container's entrypoint script on every startup (`php artisan migrate --force`) instead of treating it as a separate manual deployment step. Laravel migrations are designed to be idempotent/rerunnable, so this is safe on every deploy and removes an operator step from the release process.
 
-```bash
-php artisan migrate --force
-```
-
-as a deliberate deployment step.
-
-Avoid having every replicated application container independently run migrations.
+Only the `app` service's entrypoint should run migrations. The `queue` and `scheduler` services boot the exact same image but must skip the migration step (e.g. via an entrypoint argument or environment flag), so multiple containers never race to migrate concurrently.
 
 ---
 
@@ -1868,27 +1862,30 @@ Docker Compose files must remain suitable for Portainer Stacks.
 
 Avoid unnecessary Docker functionality that prevents normal Portainer deployment.
 
-Preferred deployment model:
+Preferred deployment model — the same one already used for this organization's baby-tracker deployment:
 
 ```text
 GitHub
   |
   v
-GitHub Actions
+Git tag push (vX.Y.Z)
+  |
+  v
+GitHub Actions (build + push)
   |
   v
 GitHub Container Registry
   |
   v
-Portainer Stack
+Portainer Stack (pull-only, Web editor)
   |
   v
 Application
 ```
 
-Production should run prebuilt immutable images.
+Production should run prebuilt immutable images pulled directly by Portainer — never rebuilt on the Portainer host for normal deployments.
 
-Do not compile the application manually inside Portainer for normal deployments.
+The default deployment path is an operator-triggered "Pull and redeploy" in Portainer after a new tag is published, not an automatic webhook. Webhook-triggered automatic redeploy is an optional future enhancement (see "Portainer Deployment Integration"), not the starting requirement.
 
 ---
 
@@ -1900,21 +1897,14 @@ Images should follow a convention similar to:
 
 ```text
 ghcr.io/<owner>/<repository>:latest
-ghcr.io/<owner>/<repository>:main
-ghcr.io/<owner>/<repository>:sha-abc123
+ghcr.io/<owner>/<repository>:v1.2.0
 ```
 
-Release tags may include:
+Publish a new image only when a version tag (`vX.Y.Z`) is pushed, or via manual `workflow_dispatch` — not on every push to `main`. Tag the published image with the exact Git tag plus `latest`. That's sufficient traceability at this project's scale; a mandatory commit-SHA tag, a `main`-tracking tag, or auto-derived semver major/minor tags add tag sprawl without a corresponding rollback or traceability benefit.
 
-```text
-v1.2.0
-1.2
-1
-```
+Pin `docker-compose.prod.yml` to a specific `vX.Y.Z` tag instead of `latest` when predictable upgrades matter more than always running the newest build.
 
-Always create an immutable commit SHA tag.
-
-Never rely exclusively on `latest`.
+Never rely exclusively on `latest` when a specific rollback target matters.
 
 ---
 
@@ -1992,59 +1982,34 @@ Never hardcode production-specific credentials or hostnames unnecessarily.
 
 # GitHub Actions
 
-Use GitHub Actions for continuous integration and image builds.
+Use GitHub Actions to build and publish the Docker image.
 
-CI should run for:
+The publish workflow triggers on:
 
-* Pull requests.
-* Relevant branch pushes.
+* A pushed version tag (`v*.*.*`).
+* Manual `workflow_dispatch`.
 
-The baseline validation flow is:
+It does not need to trigger on every push to `main` or on pull requests — publishing an image is a deliberate release action, not a continuous side effect of every commit, mirroring how this organization's baby-tracker project publishes.
 
-```text
-Checkout
-   |
-   v
-Install PHP dependencies
-   |
-   v
-Install frontend dependencies
-   |
-   v
-Formatting
-   |
-   v
-Static analysis if configured
-   |
-   v
-Tests
-   |
-   v
-Frontend build
-   |
-   v
-Docker build validation
-```
+A separate, optional `ci.yml` may still run formatting/static analysis/tests/frontend build on pull requests and pushes to `main` as a development safety net. Keep it if the team wants that safety net, but it does not gate or trigger the publish workflow — the two are independent. Pushing a release tag is what publishes an image, regardless of `ci.yml`'s state.
 
-Never deploy code when required CI checks fail.
+Never manually push directly-built images to GHCR from a developer machine — publishing always goes through the workflow so every published image is reproducible from source.
 
 ---
 
 # GitHub Workflow Structure
 
-Prefer multiple workflows when responsibilities differ.
-
-Suggested:
+Prefer a single workflow for the common case:
 
 ```text
 .github/
 └── workflows/
-    ├── ci.yml
-    ├── docker.yml
-    └── deploy.yml
+    └── docker-publish.yml
 ```
 
-A smaller application may combine workflows when doing so remains readable.
+`docker-publish.yml` triggers on pushed version tags and `workflow_dispatch`, builds the image(s), and pushes to GHCR — no separate `ci.yml`/`deploy.yml` handoff is required for the image to reach the registry.
+
+Split into multiple workflows only when a genuine reason exists (e.g. a team that wants PR-time validation kept separate from release publishing). Keep any additional workflow (such as `ci.yml`) independent of and non-blocking for `docker-publish.yml`.
 
 ---
 
@@ -2163,24 +2128,14 @@ Publish only successful builds.
 
 # Docker Tags
 
-For builds from `main`, publish suitable tags such as:
+Publish two tags per release:
 
 ```text
 latest
-main
-sha-<commit>
+v1.0.0   (the exact pushed Git tag)
 ```
 
-For Git tags:
-
-```text
-v1.0.0
-1.0
-1
-sha-<commit>
-```
-
-The immutable Git SHA tag is mandatory for production traceability.
+Do not add a mandatory commit-SHA tag, a `main`-tracking tag, or auto-derived semver major/minor tags unless a real need for them shows up — they add tag sprawl without a corresponding rollback or traceability benefit at this project's scale. `vX.Y.Z` is already unique and traceable to a commit via the annotated tag.
 
 ---
 
@@ -2210,9 +2165,9 @@ unless genuinely needed.
 
 # GitHub Secrets
 
-Store deployment secrets in GitHub Secrets or GitHub Environments.
+The default deployment path (operator-triggered "Pull and redeploy" in Portainer) needs no deployment secrets in GitHub at all — the built-in `GITHUB_TOKEN` is sufficient to publish to GHCR.
 
-Potential examples:
+Only add secrets such as:
 
 ```text
 PORTAINER_WEBHOOK
@@ -2220,9 +2175,7 @@ PORTAINER_URL
 PORTAINER_API_TOKEN
 ```
 
-Only use secrets that are genuinely required.
-
-Never print secrets in workflow logs.
+if/when automatic webhook-triggered redeploy is deliberately introduced later. Never commit these values; never print secrets in workflow logs.
 
 Application runtime secrets should normally stay in Portainer/runtime configuration rather than being injected into Docker image builds.
 
@@ -2230,113 +2183,89 @@ Application runtime secrets should normally stay in Portainer/runtime configurat
 
 # GitHub Environments
 
-When automated deployment is enabled, consider:
+GitHub Environments (`staging`, `production`) are not required for the default deployment path — there is no automated deployment step to protect.
 
-```text
-staging
-production
-```
-
-Production deployments may use GitHub Environment protection/approval.
-
-Pull requests must never receive production secrets.
+Introduce them only if/when automatic Portainer webhook deployment is added later, so production secrets stay gated behind environment protection rules. Pull requests must never receive production secrets either way.
 
 ---
 
 # Production Deployment
 
-Preferred flow:
+Preferred flow — the same one used for this organization's baby-tracker deployment:
 
 ```text
-Merge to main
+Push a vX.Y.Z tag
       |
       v
-CI succeeds
+GitHub Actions builds the image
       |
       v
-Build production image
+Push to GHCR (tags: vX.Y.Z, latest)
       |
       v
-Tag with Git SHA
+Operator: Portainer "Pull and redeploy"
       |
       v
-Push to GHCR
+Container starts
       |
       v
-Trigger Portainer deployment
+Migrations run automatically (idempotent, in the entrypoint)
       |
       v
-Pull new image
-      |
-      v
-Run migrations
-      |
-      v
-Update services
-      |
-      v
-Verify health
+Verify health (/up)
 ```
 
-A failed test/build must prevent automated deployment.
+A failed build must prevent a new image from ever reaching GHCR — but there is no separate automated "deploy" job to fail. The deploy step is the operator pulling the new tag in Portainer once they've confirmed the release is good.
 
 ---
 
 # Portainer Deployment Integration
 
-Preferred approach:
+Preferred approach — pull-only stack, no webhook:
 
-## Portainer Stack Webhook
+## Pull-only Stack (default)
 
-GitHub Actions may trigger an existing Portainer Stack webhook once a valid image has been pushed.
+Maintain a `docker-compose.prod.yml` that references only the prebuilt GHCR image (no `build:` context). An operator pastes it into Portainer's Web editor once, sets the required environment variables, and deploys. To update to a new release, the operator opens the stack in Portainer and clicks **Pull and redeploy** (or runs `docker compose pull && docker compose up -d` over SSH).
 
-Store the webhook as a GitHub Secret.
+This requires no GitHub secrets, no webhook, and no Portainer API access.
 
-Never commit the webhook URL.
+## Portainer Stack Webhook (optional, later)
 
-Alternative:
+Once the manual flow is trusted, GitHub Actions may optionally trigger an existing Portainer Stack webhook after a valid image has been pushed. Store the webhook as a GitHub Secret; never commit the webhook URL. Treat this as a deliberate future upgrade, not a starting requirement.
 
-## Portainer API
+## Portainer API (last resort)
 
-Use the API only when the webhook approach cannot provide required deployment behavior.
-
-Use narrow-scoped credentials.
-
-Never hardcode Portainer API credentials.
+Use the API only when neither of the above can provide required deployment behavior. Use narrow-scoped credentials; never hardcode Portainer API credentials.
 
 ---
 
 # Manual Deployment
 
-Before fully automating deployment, it is acceptable for CI to:
+The standard, steady-state deployment model for this project is:
 
-1. Validate.
-2. Build.
-3. Push the image to GHCR.
+1. The release workflow builds the image on a version-tag push.
+2. The workflow pushes the image to GHCR.
+3. An operator updates the Portainer stack to the new immutable image tag ("Pull and redeploy").
 
-The operator can then update the Portainer stack manually to the new immutable image tag.
-
-Do not weaken security merely to automate an immature deployment process.
+This is not a temporary stopgap on the way to full automation — it's a deliberate choice that keeps production deploys a reviewed, operator-initiated action rather than a side effect of pushing a tag. Automating the last step with a webhook is optional and should only be added if the team decides the manual click is genuinely a bottleneck.
 
 ---
 
 # Deployment Rollback
 
-Every deployment must be identifiable by Git commit.
+Every published image is identifiable by its release tag.
 
 Example:
 
 ```text
 Current:
-sha-abc123
+v1.0.16
 
 Previous:
-sha-def456
+v1.0.15
 ```
 
-Rollback should normally mean changing the image tag to the previously working immutable image.
-
-Do not require rebuilding historical source code to roll back.
+Rollback means changing the `image:` tag in `docker-compose.prod.yml` (or the Portainer stack's pinned tag) back to the previous `vX.Y.Z` release and redeploying. Do not require rebuilding historical source code to roll back — every past release tag remains pullable from GHCR.
 
 ---
 
@@ -2360,19 +2289,11 @@ The scheduler must use the exact same application image version as the primary a
 
 # Health Verification
 
-A successful Docker update is not proof of a healthy application.
+A successful "Pull and redeploy" is not proof of a healthy application.
 
-After deployment, verify the health endpoint.
+After redeploying, the operator should verify the health endpoint (e.g. `/up`) and check `docker compose logs` / the Portainer container logs before considering the release complete.
 
-For example:
-
-```text
-/up
-```
-
-If deployment health validation fails, CI/CD must clearly indicate that deployment is unhealthy.
-
-Do not silently report success.
+If a future webhook-based automated deploy is introduced, that workflow must verify health itself and clearly fail rather than silently reporting success.
 
 ---
 
@@ -2710,20 +2631,17 @@ Document the workflows.
 Explain:
 
 ```text
-ci.yml
-docker.yml
-deploy.yml
+docker-publish.yml
+ci.yml   (optional, if present)
 ```
-
-when those files exist.
 
 Document:
 
-* Their triggers.
+* Their triggers (`docker-publish.yml` fires on a pushed `vX.Y.Z` tag or manual dispatch — not on every push to `main`).
 * What each validates.
 * When images are produced.
-* Which tags are published.
-* Whether deployment is automatic or manual.
+* Which tags are published (`latest` and the exact release tag).
+* That deployment is a manual, operator-triggered "Pull and redeploy" in Portainer, not automatic.
 
 ---
 
@@ -3293,10 +3211,11 @@ Infrastructure changes are complete only when applicable checks succeed:
 * CI syntax is valid.
 * Image tags are predictable.
 * GHCR publishing configuration is correct.
-* Portainer can consume the stack.
+* Portainer can consume the stack via pull-only "Pull and redeploy".
 * Application services use the same image tag.
+* Migrations run automatically and idempotently on container startup.
 * Health checks succeed.
-* Deployment can be mapped to a Git SHA.
+* Deployment can be mapped to a Git release tag (vX.Y.Z).
 * Rollback is documented.
 * README is current.
 
@@ -3495,6 +3414,8 @@ CI Checks        CI Checks
 ```
 
 This architecture is sufficient for the expected application.
+
+The step from GHCR to the Portainer Stack is an operator-triggered pull ("Pull and redeploy"), not an automatic webhook — the same manual, deliberate deployment model already used for this organization's baby-tracker project. Add webhook automation later only if the team decides the manual step is genuinely a bottleneck.
 
 Prefer boring, understandable infrastructure over unnecessary orchestration.
 

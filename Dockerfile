@@ -24,6 +24,8 @@ RUN set -eux; \
 
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+COPY docker/php/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 RUN addgroup -g 1000 laravel && adduser -G laravel -u 1000 -D laravel
 
@@ -53,6 +55,11 @@ USER laravel
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
     CMD php artisan about > /dev/null || exit 1
 
+# RUN_MIGRATIONS=true (set only on the `app` service in
+# docker-compose.prod.yml) runs migrations before php-fpm starts. `queue`
+# and `scheduler` boot this same image with it unset, so they never race
+# `app` to migrate. See docker/php/entrypoint.sh.
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["php-fpm"]
 
 # Nginx serves static assets directly and proxies PHP requests to the `app`

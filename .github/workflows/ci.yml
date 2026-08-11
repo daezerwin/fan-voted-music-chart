@@ -98,6 +98,7 @@ jobs:
         env:
           IMAGE_REPOSITORY: ghcr.io/example/music-chart
           APP_IMAGE_TAG: ci
+          APP_KEY: base64:cGxhY2Vob2xkZXItY2ktdmFsaWRhdGlvbi1rZXk9
           DB_DATABASE: music_chart
           DB_USERNAME: music_chart
           DB_PASSWORD: password
