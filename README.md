@@ -144,13 +144,16 @@ docker compose exec app php artisan migrate
 
 ## Authentication
 
-Sign-in is Facebook-only via [Laravel Socialite](https://laravel.com/docs/socialite), reachable at
-`/auth/facebook/redirect` and `/auth/facebook/callback`. The provider→user mapping lives in a
-dedicated `user_identities` table (not on `users` directly) so additional providers (Google, Apple)
-can be added later without changing the user schema. If Facebook doesn't return an email, a
-placeholder (`facebook-{id}@no-email.invalid`) is stored and `email_verified_at` is left null.
+Two ways to sign in: Facebook via [Laravel Socialite](https://laravel.com/docs/socialite), and manual
+email/password registration.
 
-To enable real sign-in, create a Facebook app and set:
+**Facebook** is reachable at `/auth/facebook/redirect` and `/auth/facebook/callback`. The
+provider→user mapping lives in a dedicated `user_identities` table (not on `users` directly) so
+additional providers (Google, Apple) can be added later without changing the user schema. If Facebook
+doesn't return an email, a placeholder (`facebook-{id}@no-email.invalid`) is stored and
+`email_verified_at` is left null.
+
+To enable real Facebook sign-in, create a Facebook app and set:
 
 ```env
 FACEBOOK_CLIENT_ID=
@@ -160,6 +163,15 @@ FACEBOOK_REDIRECT_URI=http://localhost:8080/auth/facebook/callback
 
 Without these, the redirect still works (it builds a valid Facebook OAuth URL) but Facebook will
 reject the sign-in attempt.
+
+**Manual registration** (`/register`, `/login`) creates a user with a hashed `password` (the `users`
+table column added for this — it's nullable, since Facebook-only accounts never set one). A user who
+registered manually and later signs in with Facebook using the same email gets the identity linked to
+their existing account rather than a duplicate one, via the same account-linking logic Facebook login
+already uses. Login is rate-limited (5 attempts per email+IP, standard Laravel throttling) and both
+`/register` and `/login` redirect an already-authenticated user to the homepage rather than showing the
+form again. There's no email verification or password-reset flow yet — `email_verified_at` stays null
+for manually-registered accounts, and nothing in the app currently gates on it.
 
 ## Voting System
 

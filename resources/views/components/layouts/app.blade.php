@@ -46,7 +46,7 @@
                         name="q"
                         value="{{ request('q') }}"
                         placeholder="Search artists and songs"
-                        class="w-full rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm text-white placeholder-neutral-500 focus:border-white/30 focus:outline-none"
+                        class="w-full rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm text-white placeholder-neutral-500 focus:border-blue-500 focus:outline-none"
                     >
                 </form>
 
@@ -63,6 +63,7 @@
                         </form>
                     @else
                         <a href="{{ route('login') }}" class="hover:text-white">Sign In</a>
+                        <a href="{{ route('register') }}" class="rounded-lg bg-blue-700 px-3 py-1.5 text-white hover:bg-blue-600">Sign Up</a>
                     @endauth
                 </div>
             </nav>

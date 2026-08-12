@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\GenreController as AdminGenreController;
 use App\Http\Controllers\Admin\SongController as AdminSongController;
 use App\Http\Controllers\Admin\VoteController as AdminVoteController;
 use App\Http\Controllers\ArtistController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\SessionController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\ChartController;
@@ -45,9 +46,17 @@ Route::post('/songs/{song:slug}/votes', [VoteController::class, 'store'])
     ->middleware(['auth', 'throttle:votes'])
     ->name('votes.store');
 
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('login');
+Route::middleware('guest')->group(function () {
+    Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
+    Route::post('/register', [RegisteredUserController::class, 'store'])
+        ->middleware('throttle:auth')
+        ->name('register.store');
+
+    Route::get('/login', [SessionController::class, 'create'])->name('login');
+    Route::post('/login', [SessionController::class, 'store'])
+        ->middleware('throttle:auth')
+        ->name('login.store');
+});
 
 Route::post('/logout', [SessionController::class, 'destroy'])
     ->middleware('auth')
