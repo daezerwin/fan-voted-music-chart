@@ -1,7 +1,7 @@
 <x-layouts.admin title="Songs">
     <div class="flex items-center justify-between">
         <h1 class="text-2xl font-semibold text-white">Songs</h1>
-        <a href="{{ route('admin.songs.create') }}" class="rounded-lg bg-white px-4 py-2 text-sm font-medium text-neutral-950 hover:bg-neutral-200">
+        <a href="{{ route('admin.songs.create') }}" class="rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600">
             New Song
         </a>
     </div>

@@ -12,13 +12,13 @@
     @else
         <form action="{{ route('votes.store', $song) }}" method="POST">
             @csrf
-            <button type="submit" {{ $attributes->merge(['class' => 'inline-flex items-center justify-center rounded-lg bg-white px-5 py-2.5 font-medium text-neutral-950 hover:bg-neutral-200']) }}>
+            <button type="submit" {{ $attributes->merge(['class' => 'inline-flex items-center justify-center rounded-lg bg-blue-700 px-5 py-2.5 font-medium text-white hover:bg-blue-600']) }}>
                 Vote
             </button>
         </form>
     @endif
 @else
-    <a href="{{ route('login') }}" {{ $attributes->merge(['class' => 'inline-flex items-center justify-center rounded-lg bg-white px-5 py-2.5 font-medium text-neutral-950 hover:bg-neutral-200']) }}>
+    <a href="{{ route('login') }}" {{ $attributes->merge(['class' => 'inline-flex items-center justify-center rounded-lg bg-blue-700 px-5 py-2.5 font-medium text-white hover:bg-blue-600']) }}>
         Sign In to Vote
     </a>
 @endauth

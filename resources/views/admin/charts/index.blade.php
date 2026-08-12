@@ -18,7 +18,7 @@
                 @error('date') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
             </div>
 
-            <button type="submit" class="rounded-lg bg-white px-4 py-2 text-sm font-medium text-neutral-950 hover:bg-neutral-200">
+            <button type="submit" class="rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600">
                 Regenerate
             </button>
         </form>

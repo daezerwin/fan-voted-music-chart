@@ -5,7 +5,7 @@
             <span class="text-sm text-neutral-500">{{ $chart->chart_date->format('F j, Y') }}</span>
         </div>
 
-        <a href="{{ route('play') }}" class="mt-4 inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium text-neutral-950 hover:bg-neutral-200">
+        <a href="{{ route('play') }}" class="mt-4 inline-flex items-center gap-2 rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600">
             ▶ Play Top 10
         </a>
 

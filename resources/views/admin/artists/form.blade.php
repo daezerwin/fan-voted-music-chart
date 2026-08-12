@@ -65,7 +65,7 @@
             </label>
         </div>
 
-        <button type="submit" class="rounded-lg bg-white px-5 py-2.5 font-medium text-neutral-950 hover:bg-neutral-200">
+        <button type="submit" class="rounded-lg bg-blue-700 px-5 py-2.5 font-medium text-white hover:bg-blue-600">
             {{ $artist->exists ? 'Save Changes' : 'Create Artist' }}
         </button>
     </form>
