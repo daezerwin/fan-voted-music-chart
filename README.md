@@ -497,6 +497,14 @@ environment doesn't have, not more code:
   container's `laravel` user (uid 1000); avoid `chmod -R 777`.
 * **Assets not updating** — rebuild with `docker compose exec app npm run build`, or run `npm run dev`
   for live reload.
+* **`web` shows unhealthy in Portainer** — its healthcheck hits nginx's own `/healthz` (no PHP involved),
+  so this means nginx itself isn't serving, not that `app` is degraded. Check the `web` container logs
+  first; a failing/restarting `app` no longer flips `web` to unhealthy.
+* **No shell in a container from Portainer (e.g. "`sh`: executable file not found")** — run the artisan
+  command directly instead of opening a shell first: in Portainer's Console dialog (or
+  `docker exec <container>`), put the actual command in the "Command" field, e.g.
+  `php artisan migrate:status`, rather than `/bin/sh` followed by typing it interactively. This also
+  sidesteps whatever is breaking the interactive shell.
 
 ## Security
 

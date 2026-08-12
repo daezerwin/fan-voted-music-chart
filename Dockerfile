@@ -75,4 +75,4 @@ COPY public /var/www/html/public
 COPY --from=frontend /app/public/build /var/www/html/public/build
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD wget --spider -q http://localhost/ || exit 1
+    CMD wget --spider -q http://localhost/healthz || exit 1
