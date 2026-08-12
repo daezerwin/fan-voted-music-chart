@@ -238,8 +238,35 @@ likes/views, and nothing here downloads video/audio or interacts with YouTube en
 
 ## Admin
 
-Sign in as `admin@example.com` (seeded by `DatabaseSeeder`) to reach `/admin`, gated by the `admin`
-route middleware plus a `Gate::before` that grants admins every ability. Available today:
+`/admin` is gated by the `admin` route middleware plus a `Gate::before` that grants admins every
+ability.
+
+**Local dev**: sign in as `admin@example.com` (seeded by `DatabaseSeeder` via `php artisan db:seed`).
+
+**Production**: there's no seeded admin — `DatabaseSeeder`'s `ArtistSeeder`/`SongSeeder` use Faker to
+generate fake demo data, and Faker is a dev-only Composer dependency deliberately excluded from the
+production image (`composer install --no-dev`), so those seeders can't and shouldn't run there. Bootstrap
+the first admin instead:
+
+1. Register a real account at `/register` (or sign in with Facebook) on the live site.
+2. From the host, promote it:
+   ```bash
+   docker compose exec app php artisan users:promote-admin you@example.com
+   ```
+3. Sign in again (or refresh) — you now have `/admin` access.
+
+`GenreSeeder` has no Faker dependency (it's a fixed curated list), so it's safe to run in production
+too if you want the 10 starter genres instead of creating them by hand:
+```bash
+docker compose exec app php artisan db:seed --class=GenreSeeder --force
+```
+
+To populate the catalog from the admin UI, create **genres and artists first** — the song form requires
+picking an existing artist and genre, so there's nothing to attach a song to until those exist:
+`/admin/genres` → `/admin/artists` → `/admin/songs` (paste a full YouTube URL or a bare video ID; it's
+normalized and validated for uniqueness automatically).
+
+Available today:
 
 * **Artists / Songs / Genres** — full create/edit, with `is_active` (visibility), `is_featured`, and
   (for songs) `voting_enabled` toggles. Deleting an artist or song is intentionally not exposed —
