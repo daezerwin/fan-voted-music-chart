@@ -15,7 +15,7 @@ class ShuffleController extends Controller
 
         abort_if($song === null, 404);
 
-        return redirect()->route('songs.show', $song);
+        return redirect()->route('songs.show', [$song, 'shuffle' => 'all']);
     }
 
     public function forArtist(Artist $artist, GetRandomSong $getRandomSong): RedirectResponse
@@ -26,7 +26,7 @@ class ShuffleController extends Controller
 
         abort_if($song === null, 404);
 
-        return redirect()->route('songs.show', $song);
+        return redirect()->route('songs.show', [$song, 'shuffle' => 'artist', 'scope' => $artist->slug]);
     }
 
     public function forGenre(Genre $genre, GetRandomSong $getRandomSong): RedirectResponse
@@ -35,6 +35,6 @@ class ShuffleController extends Controller
 
         abort_if($song === null, 404);
 
-        return redirect()->route('songs.show', $song);
+        return redirect()->route('songs.show', [$song, 'shuffle' => 'genre', 'scope' => $genre->slug]);
     }
 }

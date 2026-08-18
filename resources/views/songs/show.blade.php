@@ -48,20 +48,39 @@
                     <p class="mt-4 max-w-2xl text-neutral-300">{{ $song->description }}</p>
                 @endif
 
-                <div class="mt-6">
+                <div class="mt-6 flex items-center gap-3">
                     <x-vote-button :song="$song" :has-voted="$hasVotedToday" />
+
+                    @if ($shuffleNextUrl)
+                        <a
+                            href="{{ $shuffleNextUrl }}"
+                            class="rounded-lg border border-white/10 px-4 py-2 text-sm font-medium text-neutral-300 hover:border-white/20 hover:text-white"
+                        >
+                            Next
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>
 
-        <div class="mt-8 aspect-video w-full overflow-hidden rounded-lg bg-black">
-            <iframe
-                class="h-full w-full"
-                src="https://www.youtube.com/embed/{{ $song->youtube_video_id }}"
-                title="{{ $song->title }}"
-                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-            ></iframe>
-        </div>
+        @if ($shuffleNextUrl)
+            <div
+                class="mt-8 aspect-video w-full overflow-hidden rounded-lg bg-black"
+                x-data="shufflePlayer(@js($song->youtube_video_id), @js($shuffleNextUrl))"
+                x-init="init()"
+            >
+                <div id="shuffle-youtube-player" class="h-full w-full"></div>
+            </div>
+        @else
+            <div class="mt-8 aspect-video w-full overflow-hidden rounded-lg bg-black">
+                <iframe
+                    class="h-full w-full"
+                    src="https://www.youtube.com/embed/{{ $song->youtube_video_id }}"
+                    title="{{ $song->title }}"
+                    allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                ></iframe>
+            </div>
+        @endif
     </div>
 </x-layouts.app>
