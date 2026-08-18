@@ -32,9 +32,14 @@
 </head>
 <body class="h-full bg-background text-ink antialiased">
     <div class="flex min-h-full flex-col">
-        <header class="border-b border-white/10 bg-background/80 backdrop-blur">
+        <header class="border-b border-black/10 bg-background/80 backdrop-blur">
             <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8" aria-label="Primary">
-                <a href="{{ url('/') }}" class="text-lg font-semibold tracking-tight text-ink">
+                <a href="{{ url('/') }}" class="flex items-center gap-2 text-lg font-semibold tracking-tight text-ink">
+                    <svg viewBox="0 0 24 24" fill="none" class="h-6 w-6 shrink-0 text-primary" aria-hidden="true">
+                        <rect x="3" y="10" width="4.5" height="11" rx="1.5" fill="currentColor" />
+                        <rect x="9.75" y="4" width="4.5" height="17" rx="1.5" fill="currentColor" />
+                        <rect x="16.5" y="13" width="4.5" height="8" rx="1.5" fill="currentColor" />
+                    </svg>
                     {{ config('app.name') }}
                 </a>
 
@@ -46,7 +51,7 @@
                         name="q"
                         value="{{ request('q') }}"
                         placeholder="Search artists and songs"
-                        class="w-full rounded-full border border-white/10 bg-surface px-4 py-1.5 text-sm text-ink placeholder-muted focus:border-primary focus:outline-none"
+                        class="w-full rounded-full border border-black/10 bg-surface px-4 py-1.5 text-sm text-ink placeholder-muted focus:border-primary focus:outline-none"
                     >
                 </form>
 
@@ -74,7 +79,7 @@
             {{ $slot }}
         </main>
 
-        <footer class="border-t border-white/10">
+        <footer class="border-t border-black/10">
             <div class="mx-auto max-w-6xl px-4 py-8 text-sm text-muted sm:px-6 lg:px-8">
                 <p>{{ config('app.name') }} is an independent, community-driven music chart. Not affiliated with Billboard.</p>
             </div>

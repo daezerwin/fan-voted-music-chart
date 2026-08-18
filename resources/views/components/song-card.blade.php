@@ -1,7 +1,7 @@
 @props(['song'])
 
-<a href="{{ route('songs.show', $song) }}" class="group flex items-center gap-4 rounded-lg border border-white/10 bg-surface p-3 transition hover:border-white/20 hover:bg-white/10">
-    <div class="h-14 w-14 shrink-0 overflow-hidden rounded-md bg-white/10">
+<a href="{{ route('songs.show', $song) }}" class="group flex items-center gap-4 rounded-lg border border-black/10 bg-surface p-3 transition hover:border-black/20 hover:bg-black/10">
+    <div class="h-14 w-14 shrink-0 overflow-hidden rounded-md bg-black/10">
         @if ($song->cover_image)
             <img src="{{ $song->cover_image }}" alt="{{ $song->title }}" class="h-full w-full object-cover" loading="lazy">
         @else

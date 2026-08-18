@@ -11,6 +11,7 @@ export default function youtubePlayerControls() {
         muted: false,
         scrubbing: false,
         progressTimer: null,
+        fullscreen: false,
 
         bindPlayerControlEvents(player) {
             this.volume = player.getVolume();
@@ -88,6 +89,18 @@ export default function youtubePlayerControls() {
             if (value > 0 && this.player?.isMuted()) {
                 this.player.unMute();
             }
+        },
+
+        toggleFullscreen() {
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            } else {
+                this.$refs.player?.requestFullscreen?.();
+            }
+        },
+
+        onFullscreenChange() {
+            this.fullscreen = document.fullscreenElement !== null;
         },
 
         formatTime(seconds) {

@@ -6,7 +6,7 @@
 >
     <div class="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
         @if (session('status'))
-            <p class="mb-6 rounded-lg border border-success/30 bg-success/10 px-4 py-3 text-sm text-success">
+            <p class="mb-6 rounded-lg border border-success/30 bg-success/10 px-4 py-3 text-sm text-ink">
                 {{ session('status') }}
             </p>
         @endif
@@ -20,9 +20,11 @@
         <div class="grid gap-8 lg:grid-cols-3">
             <div class="lg:col-span-2">
                 <div
-                    class="group relative aspect-video w-full overflow-hidden rounded-lg bg-background"
+                    class="group relative aspect-video w-full overflow-hidden rounded-lg bg-black"
                     x-data="shufflePlayer(@js($song->youtube_video_id), @js($nextSongUrl ?? route('shuffle.all')))"
                     x-init="init()"
+                    x-ref="player"
+                    @fullscreenchange.document="onFullscreenChange()"
                 >
                     <div id="shuffle-youtube-player" class="h-full w-full"></div>
 
@@ -53,7 +55,7 @@
 
                     <a
                         href="{{ $nextSongUrl ?? route('shuffle.all') }}"
-                        class="rounded-lg border border-white/10 px-4 py-2 text-sm font-medium text-muted hover:border-white/20 hover:text-ink"
+                        class="rounded-lg border border-black/10 px-4 py-2 text-sm font-medium text-muted hover:border-black/20 hover:text-ink"
                     >
                         Next
                     </a>

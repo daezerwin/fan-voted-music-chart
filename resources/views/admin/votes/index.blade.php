@@ -4,7 +4,7 @@
 
         <form action="{{ route('admin.votes.index') }}" method="GET" class="flex items-center gap-2">
             <input type="date" name="date" value="{{ $date }}" onchange="this.form.submit()"
-                class="rounded-lg border border-white/10 bg-surface px-3 py-1.5 text-sm text-ink">
+                class="rounded-lg border border-black/10 bg-surface px-3 py-1.5 text-sm text-ink">
         </form>
     </div>
 
@@ -13,7 +13,7 @@
         Visibility only — no automated fraud scoring exists yet. Use this to spot unusual vote velocity.
     </p>
 
-    <div class="mt-4 divide-y divide-white/10 rounded-lg border border-white/10">
+    <div class="mt-4 divide-y divide-black/10 rounded-lg border border-black/10">
         @forelse ($topVoters as $row)
             <div class="flex items-center justify-between gap-4 p-4">
                 <span class="truncate text-ink">{{ $row->user->name ?? 'Unknown user' }}</span>
@@ -31,7 +31,7 @@
         prompt for moderation review, not an automatic signal.
     </p>
 
-    <div class="mt-4 divide-y divide-white/10 rounded-lg border border-white/10">
+    <div class="mt-4 divide-y divide-black/10 rounded-lg border border-black/10">
         @forelse ($sharedIps as $row)
             <div class="flex items-center justify-between gap-4 p-4 text-sm">
                 <span class="truncate text-ink">{{ $row->ip_address }}</span>
@@ -44,7 +44,7 @@
 
     <h2 class="mt-8 text-lg font-semibold text-ink">Recent Votes</h2>
 
-    <div class="mt-4 divide-y divide-white/10 rounded-lg border border-white/10">
+    <div class="mt-4 divide-y divide-black/10 rounded-lg border border-black/10">
         @forelse ($recentVotes as $vote)
             <div class="flex items-center justify-between gap-4 p-4 text-sm">
                 <span class="truncate text-ink">{{ $vote->user->name ?? 'Unknown user' }}</span>

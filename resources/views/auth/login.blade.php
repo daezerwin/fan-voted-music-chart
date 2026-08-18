@@ -17,9 +17,9 @@
         </a>
 
         <div class="my-6 flex items-center gap-3 text-xs text-muted">
-            <span class="h-px flex-1 bg-white/10"></span>
+            <span class="h-px flex-1 bg-black/10"></span>
             or
-            <span class="h-px flex-1 bg-white/10"></span>
+            <span class="h-px flex-1 bg-black/10"></span>
         </div>
 
         <form action="{{ route('login.store') }}" method="POST" class="space-y-4">
@@ -28,18 +28,18 @@
             <div>
                 <label for="email" class="block text-sm font-medium text-muted">Email</label>
                 <input id="email" name="email" type="email" value="{{ old('email') }}" required autofocus
-                    class="mt-1 w-full rounded-lg border border-white/10 bg-surface px-3 py-2 text-ink focus:border-primary focus:outline-none">
+                    class="mt-1 w-full rounded-lg border border-black/10 bg-surface px-3 py-2 text-ink focus:border-primary focus:outline-none">
                 @error('email') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
             </div>
 
             <div>
                 <label for="password" class="block text-sm font-medium text-muted">Password</label>
                 <input id="password" name="password" type="password" required
-                    class="mt-1 w-full rounded-lg border border-white/10 bg-surface px-3 py-2 text-ink focus:border-primary focus:outline-none">
+                    class="mt-1 w-full rounded-lg border border-black/10 bg-surface px-3 py-2 text-ink focus:border-primary focus:outline-none">
             </div>
 
             <label class="flex items-center gap-2 text-sm text-muted">
-                <input type="checkbox" name="remember" value="1" class="rounded border-white/20 bg-surface">
+                <input type="checkbox" name="remember" value="1" class="rounded border-black/20 bg-surface">
                 Remember me
             </label>
 
