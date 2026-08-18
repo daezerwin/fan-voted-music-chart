@@ -500,11 +500,17 @@ environment doesn't have, not more code:
 * **`web` shows unhealthy in Portainer** — its healthcheck hits nginx's own `/healthz` (no PHP involved),
   so this means nginx itself isn't serving, not that `app` is degraded. Check the `web` container logs
   first; a failing/restarting `app` no longer flips `web` to unhealthy.
-* **No shell in a container from Portainer (e.g. "`sh`: executable file not found")** — run the artisan
-  command directly instead of opening a shell first: in Portainer's Console dialog (or
-  `docker exec <container>`), put the actual command in the "Command" field, e.g.
-  `php artisan migrate:status`, rather than `/bin/sh` followed by typing it interactively. This also
-  sidesteps whatever is breaking the interactive shell.
+* **Need to run `php artisan` in production** — `music-chart-app` (the `app` service's fixed
+  `container_name` in `docker-compose.prod.yml`) is the only container with PHP/artisan; `web` is
+  nginx-only and has no `php` binary at all. From Portainer's Console for `music-chart-app`, or
+  `docker exec -it music-chart-app sh` from the host — there's no `bash` on this Alpine-based image,
+  only `sh`, and it's enough to run any artisan command. `queue`/`scheduler` run the same image but are
+  for their background command only, not meant for interactive use.
+* **If `app` keeps crash-looping and you can't exec into it at all** — a failed migration on boot used
+  to take the whole container down with it (`entrypoint.sh` used to exit non-zero via `set -e`, so
+  `php-fpm` never started and the container endlessly restarted with no way to exec in and fix it). This
+  is now non-fatal — check `docker logs music-chart-app` for a `WARNING: migrations failed` line and run
+  the migration by hand once you're in.
 
 ## Security
 

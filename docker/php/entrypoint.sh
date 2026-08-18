@@ -7,7 +7,11 @@ set -e
 # docker-compose.prod.yml. Migrations are idempotent, so running this once
 # per deploy on every `app` container start is safe.
 if [ "$RUN_MIGRATIONS" = "true" ]; then
-    php artisan migrate --force
+    # A failed migration must not take the whole container down: that would
+    # make `app` (the only image with php/artisan) crash-loop and become
+    # unreachable via `docker exec`, right when you most need to get in and
+    # run artisan by hand to diagnose it.
+    php artisan migrate --force || echo "WARNING: migrations failed — continuing startup so the container stays reachable" >&2
 fi
 
 exec "$@"

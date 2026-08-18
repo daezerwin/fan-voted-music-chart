@@ -63,6 +63,7 @@ x-app-env: &app-env
 services:
   web:
     image: ${IMAGE_REPOSITORY:-ghcr.io/daezerwin/fan-voted-music-chart}-web:${APP_IMAGE_TAG:-latest}
+    container_name: music-chart-web
     restart: unless-stopped
     ports:
       - "${APP_PORT:-8080}:80"
@@ -72,8 +73,14 @@ services:
     networks:
       - app-network
 
+  # The only container with php/artisan — `docker exec music-chart-app php
+  # artisan ...` (or open a shell with `docker exec -it music-chart-app sh`;
+  # there's no bash on this Alpine-based image, only sh). `queue` and
+  # `scheduler` below run the same image but exist only to run their
+  # background command, not for interactive use.
   app:
     image: ${IMAGE_REPOSITORY:-ghcr.io/daezerwin/fan-voted-music-chart}:${APP_IMAGE_TAG:-latest}
+    container_name: music-chart-app
     restart: unless-stopped
     environment:
       <<: *app-env
@@ -88,6 +95,7 @@ services:
 
   queue:
     image: ${IMAGE_REPOSITORY:-ghcr.io/daezerwin/fan-voted-music-chart}:${APP_IMAGE_TAG:-latest}
+    container_name: music-chart-queue
     restart: unless-stopped
     command: php artisan queue:work --sleep=3 --tries=3 --timeout=90
     environment:
@@ -102,6 +110,7 @@ services:
 
   scheduler:
     image: ${IMAGE_REPOSITORY:-ghcr.io/daezerwin/fan-voted-music-chart}:${APP_IMAGE_TAG:-latest}
+    container_name: music-chart-scheduler
     restart: unless-stopped
     command: php artisan schedule:work
     environment:
@@ -116,6 +125,7 @@ services:
 
   database:
     image: mysql:8.0
+    container_name: music-chart-database
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: ${DB_DATABASE:?required}
@@ -135,6 +145,7 @@ services:
 
   redis:
     image: redis:7-alpine
+    container_name: music-chart-redis
     restart: unless-stopped
     command: --requirepass ${REDIS_PASSWORD:?required}
     volumes:
