@@ -1,5 +1,8 @@
+import youtubePlayerControls from './youtube-player-controls';
+
 export default function topTenPlayer(queue) {
     return {
+        ...youtubePlayerControls(),
         queue,
         index: 0,
         player: null,
@@ -33,12 +36,15 @@ export default function topTenPlayer(queue) {
         createPlayer() {
             this.player = new YT.Player('youtube-player', {
                 videoId: this.current.videoId,
-                playerVars: { rel: 0 },
+                playerVars: { rel: 0, controls: 0 },
                 events: {
                     onReady: () => {
                         this.ready = true;
+                        this.bindPlayerControlEvents(this.player);
                     },
                     onStateChange: (event) => {
+                        this.onPlayerStateChange(event);
+
                         if (event.data === YT.PlayerState.ENDED) {
                             this.playNext();
                         }

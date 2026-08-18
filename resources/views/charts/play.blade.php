@@ -5,8 +5,10 @@
         @if ($entries->isEmpty())
             <x-empty-state message="No chart is available to play yet." class="mt-6" />
         @else
-            <div class="mt-6 aspect-video w-full overflow-hidden rounded-lg bg-black">
+            <div class="group relative mt-6 aspect-video w-full overflow-hidden rounded-lg bg-black">
                 <div id="youtube-player" class="h-full w-full"></div>
+
+                <x-youtube-player-controls />
             </div>
 
             <div class="mt-4 flex items-center justify-between gap-4">

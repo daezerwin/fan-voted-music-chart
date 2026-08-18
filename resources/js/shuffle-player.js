@@ -1,5 +1,8 @@
+import youtubePlayerControls from './youtube-player-controls';
+
 export default function shufflePlayer(videoId, nextUrl) {
     return {
+        ...youtubePlayerControls(),
         videoId,
         nextUrl,
         player: null,
@@ -25,12 +28,15 @@ export default function shufflePlayer(videoId, nextUrl) {
         createPlayer() {
             this.player = new YT.Player('shuffle-youtube-player', {
                 videoId: this.videoId,
-                playerVars: { rel: 0, autoplay: 1 },
+                playerVars: { rel: 0, autoplay: 1, controls: 0 },
                 events: {
                     onReady: () => {
                         this.ready = true;
+                        this.bindPlayerControlEvents(this.player);
                     },
                     onStateChange: (event) => {
+                        this.onPlayerStateChange(event);
+
                         if (event.data === YT.PlayerState.ENDED) {
                             this.playNext();
                         }

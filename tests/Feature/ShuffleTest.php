@@ -106,6 +106,28 @@ class ShuffleTest extends TestCase
         $response->assertSee('No other songs to play next yet.');
     }
 
+    public function test_song_page_up_next_queue_holds_up_to_ten_songs(): void
+    {
+        $song = Song::factory()->create();
+        Song::factory()->count(12)->create();
+
+        $response = $this->get(route('songs.show', $song));
+
+        $response->assertOk();
+        $response->assertViewHas('queue', fn ($queue) => $queue->count() === 10);
+    }
+
+    public function test_song_page_up_next_queue_is_capped_at_available_songs(): void
+    {
+        $song = Song::factory()->create();
+        Song::factory()->count(3)->create();
+
+        $response = $this->get(route('songs.show', $song));
+
+        $response->assertOk();
+        $response->assertViewHas('queue', fn ($queue) => $queue->count() === 3);
+    }
+
     public function test_artist_scoped_next_pick_stays_within_that_artist(): void
     {
         $artist = Artist::factory()->create();

@@ -2,17 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\Songs\GetRandomSong;
+use App\Actions\Songs\GetShuffleQueue;
 use App\Models\Artist;
 use App\Models\Genre;
 use App\Models\Song;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
 class SongController extends Controller
 {
-    public function show(Request $request, Song $song, GetRandomSong $getRandomSong): View
+    /**
+     * How many upcoming songs the "Up Next" queue holds.
+     */
+    private const QUEUE_SIZE = 10;
+
+    public function show(Request $request, Song $song, GetShuffleQueue $getShuffleQueue): View
     {
         $song->load(['artist', 'genre']);
 
@@ -23,19 +29,20 @@ class SongController extends Controller
         $hasVotedToday = Auth::check()
             && $song->votes()->where('user_id', Auth::id())->where('vote_date', now()->toDateString())->exists();
 
-        [$nextSong, $nextSongUrl] = $this->resolveNext(
+        $queue = $this->resolveQueue(
             $request->query('shuffle'),
             $request->query('scope'),
             $song,
-            $getRandomSong,
+            $getShuffleQueue,
         );
 
         return view('songs.show', [
             'song' => $song,
             'todayVoteCount' => $todayVoteCount,
             'hasVotedToday' => $hasVotedToday,
-            'nextSong' => $nextSong,
-            'nextSongUrl' => $nextSongUrl,
+            'queue' => $queue,
+            'nextSong' => $queue->first()['song'] ?? null,
+            'nextSongUrl' => $queue->first()['url'] ?? null,
         ]);
     }
 
@@ -48,9 +55,9 @@ class SongController extends Controller
      * scope is re-resolved against real records, rather than trusted as
      * given, so it can't be used to leak an inactive artist/genre's songs.
      *
-     * @return array{0: ?Song, 1: ?string}
+     * @return Collection<int, array{song: Song, url: string}>
      */
-    private function resolveNext(?string $mode, ?string $scope, Song $current, GetRandomSong $getRandomSong): array
+    private function resolveQueue(?string $mode, ?string $scope, Song $current, GetShuffleQueue $getShuffleQueue): Collection
     {
         $artistId = null;
         $genreId = null;
@@ -75,29 +82,25 @@ class SongController extends Controller
             }
         }
 
-        $nextSong = $getRandomSong(artistId: $artistId, genreId: $genreId, excludeId: $current->id);
+        $queue = $getShuffleQueue(artistId: $artistId, genreId: $genreId, excludeId: $current->id, limit: self::QUEUE_SIZE);
 
         // The scope had nothing else to offer (e.g. an artist with only one
-        // song) — fall back to any other active song rather than showing
+        // song) — fall back to any other active songs rather than showing
         // no "Up Next" at all.
-        if ($nextSong === null && ($artistId !== null || $genreId !== null)) {
-            $nextSong = $getRandomSong(excludeId: $current->id);
+        if ($queue->isEmpty() && ($artistId !== null || $genreId !== null)) {
+            $queue = $getShuffleQueue(excludeId: $current->id, limit: self::QUEUE_SIZE);
             $effectiveMode = 'all';
             $effectiveScope = null;
         }
 
-        if ($nextSong === null) {
-            return [null, null];
-        }
+        return $queue->map(function (Song $song) use ($effectiveMode, $effectiveScope) {
+            $routeParams = [$song, 'shuffle' => $effectiveMode];
 
-        $nextSong->load('artist');
+            if ($effectiveScope !== null) {
+                $routeParams['scope'] = $effectiveScope;
+            }
 
-        $routeParams = [$nextSong, 'shuffle' => $effectiveMode];
-
-        if ($effectiveScope !== null) {
-            $routeParams['scope'] = $effectiveScope;
-        }
-
-        return [$nextSong, route('songs.show', $routeParams)];
+            return ['song' => $song, 'url' => route('songs.show', $routeParams)];
+        });
     }
 }
