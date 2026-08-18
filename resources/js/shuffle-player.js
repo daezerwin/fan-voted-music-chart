@@ -28,10 +28,16 @@ export default function shufflePlayer(videoId, nextUrl) {
         createPlayer() {
             this.player = new YT.Player('shuffle-youtube-player', {
                 videoId: this.videoId,
-                playerVars: { rel: 0, autoplay: 1, controls: 0 },
+                // Browsers only guarantee autoplay when muted — an unmuted
+                // autoplay request is silently blocked, leaving the video
+                // paused on its title card. Start muted so autoplay actually
+                // runs; the volume control lets the viewer unmute.
+                playerVars: { rel: 0, autoplay: 1, mute: 1, playsinline: 1, controls: 0 },
                 events: {
                     onReady: () => {
                         this.ready = true;
+                        this.player.mute();
+                        this.player.playVideo();
                         this.bindPlayerControlEvents(this.player);
                     },
                     onStateChange: (event) => {

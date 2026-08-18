@@ -12,6 +12,8 @@ export default function youtubePlayerControls() {
         scrubbing: false,
         progressTimer: null,
         fullscreen: false,
+        showControls: false,
+        hideControlsTimer: null,
 
         bindPlayerControlEvents(player) {
             this.volume = player.getVolume();
@@ -101,6 +103,17 @@ export default function youtubePlayerControls() {
 
         onFullscreenChange() {
             this.fullscreen = document.fullscreenElement !== null;
+        },
+
+        // :hover/:focus-within reveal the bar on desktop; touchscreens have
+        // neither, so a tap has to pin it open the same way, with a timeout
+        // standing in for "stopped hovering".
+        revealControls() {
+            this.showControls = true;
+            clearTimeout(this.hideControlsTimer);
+            this.hideControlsTimer = setTimeout(() => {
+                this.showControls = false;
+            }, 3000);
         },
 
         formatTime(seconds) {

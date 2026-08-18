@@ -1,11 +1,13 @@
 {{-- Custom control bar for a YouTube embed with playerVars.controls = 0. The
-     parent element must carry `group relative` — visibility is pure CSS
-     :hover with no transition, so it appears/disappears instantly. --}}
-<div class="absolute inset-0 cursor-pointer" @click="togglePlay()"></div>
+     parent element must carry `group relative`. Desktop reveals it on
+     :hover/:focus-within (instant, no transition); touchscreens have neither,
+     so a tap pins it open via `showControls` instead. --}}
+<div class="absolute inset-0 cursor-pointer" @click="togglePlay(); revealControls()"></div>
 
 <div
-    class="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col gap-2 bg-gradient-to-t from-black/85 to-transparent px-3 pb-2 pt-8 opacity-0 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100"
-    @click.stop
+    class="absolute inset-x-0 bottom-0 flex flex-col gap-2 bg-gradient-to-t from-black/85 to-transparent px-3 pb-2 pt-8 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100"
+    :class="showControls ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'"
+    @click.stop="revealControls()"
 >
     <input
         type="range"
