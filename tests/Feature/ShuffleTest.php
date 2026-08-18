@@ -61,33 +61,62 @@ class ShuffleTest extends TestCase
         $response->assertRedirect(route('songs.show', [$song, 'shuffle' => 'genre', 'scope' => $genre->slug]));
     }
 
-    public function test_song_page_shows_a_next_link_when_reached_via_shuffle(): void
+    public function test_song_page_shows_an_up_next_preview_and_link(): void
     {
         $song = Song::factory()->create();
+        $nextSong = Song::factory()->create();
 
         $response = $this->get(route('songs.show', [$song, 'shuffle' => 'all']));
 
         $response->assertOk();
-        $response->assertSee(route('shuffle.all'), false);
+        $response->assertSee('shuffle-youtube-player');
+        $response->assertSee($nextSong->title);
+        $response->assertSee(route('songs.show', [$nextSong, 'shuffle' => 'all']), false);
     }
 
-    public function test_song_page_has_no_next_link_outside_of_shuffle(): void
+    public function test_song_page_defaults_to_a_site_wide_next_pick(): void
+    {
+        $song = Song::factory()->create();
+        $nextSong = Song::factory()->create();
+
+        $response = $this->get(route('songs.show', $song));
+
+        $response->assertOk();
+        $response->assertSee($nextSong->title);
+    }
+
+    public function test_song_page_falls_back_to_a_site_wide_pick_for_an_unknown_scope(): void
+    {
+        $song = Song::factory()->create();
+        $nextSong = Song::factory()->create();
+
+        $response = $this->get(route('songs.show', [$song, 'shuffle' => 'artist', 'scope' => 'does-not-exist']));
+
+        $response->assertOk();
+        $response->assertSee($nextSong->title);
+    }
+
+    public function test_song_page_shows_no_up_next_when_it_is_the_only_song(): void
     {
         $song = Song::factory()->create();
 
         $response = $this->get(route('songs.show', $song));
 
         $response->assertOk();
-        $response->assertDontSee('shuffle-youtube-player');
+        $response->assertSee('No other songs to play next yet.');
     }
 
-    public function test_song_page_ignores_an_unknown_shuffle_scope(): void
+    public function test_artist_scoped_next_pick_stays_within_that_artist(): void
     {
-        $song = Song::factory()->create();
+        $artist = Artist::factory()->create();
+        $song = Song::factory()->create(['artist_id' => $artist->id]);
+        $sameArtistSong = Song::factory()->create(['artist_id' => $artist->id]);
+        $otherArtistSong = Song::factory()->create();
 
-        $response = $this->get(route('songs.show', [$song, 'shuffle' => 'artist', 'scope' => 'does-not-exist']));
+        $response = $this->get(route('songs.show', [$song, 'shuffle' => 'artist', 'scope' => $artist->slug]));
 
         $response->assertOk();
-        $response->assertDontSee('shuffle-youtube-player');
+        $response->assertSee($sameArtistSong->title);
+        $response->assertDontSee($otherArtistSong->title);
     }
 }
