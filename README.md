@@ -255,11 +255,16 @@ the first admin instead:
    ```
 3. Sign in again (or refresh) — you now have `/admin` access.
 
-`GenreSeeder` has no Faker dependency (it's a fixed curated list), so it's safe to run in production
-too if you want the 10 starter genres instead of creating them by hand:
+`GenreSeeder`, `CuratedArtistSeeder`, and `CuratedSongSeeder` have no Faker dependency, so they're safe
+to run in production if you want real starter content instead of building the catalog by hand:
 ```bash
 docker compose exec app php artisan db:seed --class=GenreSeeder --force
+docker compose exec app php artisan db:seed --class=CuratedArtistSeeder --force
+docker compose exec app php artisan db:seed --class=CuratedSongSeeder --force
 ```
+`CuratedArtistSeeder` adds 7 real artists (Hale, Cueshe, Shamrock, Maroon 5, Backstreet Boys, Westlife,
+Katy Perry) and `CuratedSongSeeder` adds ~94 of their songs, each pointing at a verified official-channel
+YouTube music video — run the artist seeder first.
 
 To populate the catalog from the admin UI, create **genres and artists first** — the song form requires
 picking an existing artist and genre, so there's nothing to attach a song to until those exist:
