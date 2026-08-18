@@ -16,9 +16,23 @@ class GetLatestDailyChart
      */
     public function __invoke(): ?Chart
     {
-        return Cache::remember('charts:daily:latest', now()->addHour(), fn () => Chart::query()
+        $query = fn () => Chart::query()
             ->where('chart_type', ChartType::Daily)
             ->latest('chart_date')
-            ->first());
+            ->first();
+
+        $chart = Cache::remember('charts:daily:latest', now()->addHour(), $query);
+
+        // A cached entry can outlive the class shape it was serialized
+        // under (e.g. a Redis value written before a deploy), in which case
+        // unserialize() hands back a __PHP_Incomplete_Class instead of a
+        // Chart. Treat that the same as a cache miss rather than crashing.
+        if ($chart !== null && ! $chart instanceof Chart) {
+            Cache::forget('charts:daily:latest');
+
+            return Cache::remember('charts:daily:latest', now()->addHour(), $query);
+        }
+
+        return $chart;
     }
 }
