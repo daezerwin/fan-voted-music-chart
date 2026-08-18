@@ -12,14 +12,14 @@
         <div>
             <label for="name" class="block text-sm font-medium text-muted">Name</label>
             <input id="name" name="name" type="text" value="{{ old('name', $genre->name) }}" required
-                class="mt-1 w-full rounded-lg border border-black/10 bg-surface px-3 py-2 text-ink">
+                class="mt-1 w-full rounded-lg border border-white/10 bg-surface px-3 py-2 text-ink">
             @error('name') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
         </div>
 
         <div>
             <label for="slug" class="block text-sm font-medium text-muted">Slug</label>
             <input id="slug" name="slug" type="text" value="{{ old('slug', $genre->slug) }}" placeholder="Auto-generated from name if left blank"
-                class="mt-1 w-full rounded-lg border border-black/10 bg-surface px-3 py-2 text-ink">
+                class="mt-1 w-full rounded-lg border border-white/10 bg-surface px-3 py-2 text-ink">
             @error('slug') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
         </div>
 

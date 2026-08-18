@@ -1,17 +1,15 @@
 @props(['entry', 'hasVoted' => false])
 
-<div class="flex items-center gap-3 rounded-lg border {{ $entry->rank === 1 ? 'border-highlight/50' : 'border-black/10' }} bg-surface p-3 sm:gap-4">
-    <div class="flex w-8 shrink-0 items-center justify-center text-lg font-bold text-ink">
-        <span class="{{ $entry->rank === 1 ? 'flex h-8 w-8 items-center justify-center rounded-full bg-highlight' : '' }}">
-            {{ $entry->rank }}
-        </span>
+<div class="flex items-center gap-3 rounded-lg border {{ $entry->rank === 1 ? 'border-highlight/50' : 'border-white/10' }} bg-surface p-3 sm:gap-4">
+    <div class="w-8 shrink-0 text-center text-lg font-bold {{ $entry->rank === 1 ? 'text-highlight' : 'text-ink' }}">
+        {{ $entry->rank }}
     </div>
 
     <div class="w-14 shrink-0">
         <x-movement-indicator :entry="$entry" />
     </div>
 
-    <div class="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-black/10">
+    <div class="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-white/10">
         @if ($entry->song->cover_image)
             <img src="{{ $entry->song->cover_image }}" alt="{{ $entry->song->title }}" class="h-full w-full object-cover" loading="lazy">
         @else

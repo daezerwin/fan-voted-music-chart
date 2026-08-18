@@ -6,7 +6,7 @@
         </a>
     </div>
 
-    <div class="mt-6 divide-y divide-black/10 rounded-lg border border-black/10">
+    <div class="mt-6 divide-y divide-white/10 rounded-lg border border-white/10">
         @forelse ($genres as $genre)
             <div class="flex items-center justify-between gap-4 p-4">
                 <div class="min-w-0">

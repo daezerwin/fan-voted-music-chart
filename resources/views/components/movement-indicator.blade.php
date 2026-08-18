@@ -5,7 +5,7 @@
 @elseif ($entry->isReentry())
     <span class="text-xs font-semibold text-primary">RE-ENTRY</span>
 @elseif ($entry->movement > 0)
-    <span class="inline-flex items-center gap-0.5 rounded bg-success/20 px-1 text-xs font-semibold text-ink">
+    <span class="inline-flex items-center gap-0.5 text-xs font-semibold text-success">
         <span aria-hidden="true">▲</span>{{ $entry->movement }}
     </span>
 @elseif ($entry->movement < 0)

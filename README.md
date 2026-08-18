@@ -1,4 +1,4 @@
-# Fan-Voted Music Chart
+# Chartwave
 
 ## About
 

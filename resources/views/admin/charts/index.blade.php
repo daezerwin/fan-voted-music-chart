@@ -1,7 +1,7 @@
 <x-layouts.admin title="Charts">
     <h1 class="text-2xl font-semibold text-ink">Chart Tools</h1>
 
-    <div class="mt-6 max-w-md rounded-lg border border-black/10 bg-surface p-6">
+    <div class="mt-6 max-w-md rounded-lg border border-white/10 bg-surface p-6">
         <h2 class="font-medium text-ink">Regenerate Daily Chart</h2>
         <p class="mt-1 text-sm text-muted">
             Recalculates and replaces the chart snapshot for the given vote date. Safe to rerun.
@@ -14,7 +14,7 @@
                 <label for="date" class="block text-sm font-medium text-muted">Vote date</label>
                 <input id="date" name="date" type="date" required value="{{ old('date', now()->subDay()->toDateString()) }}"
                     max="{{ now()->toDateString() }}"
-                    class="mt-1 w-full rounded-lg border border-black/10 bg-surface px-3 py-2 text-ink">
+                    class="mt-1 w-full rounded-lg border border-white/10 bg-surface px-3 py-2 text-ink">
                 @error('date') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
             </div>
 

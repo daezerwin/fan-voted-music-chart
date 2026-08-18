@@ -1,6 +1,6 @@
 # AGENTS.md
 
-# Project: Fan-Voted Music Chart Platform
+# Project: Chartwave (Fan-Voted Music Chart Platform)
 
 ## Project Mission
 

@@ -1,7 +1,7 @@
 @props(['artist'])
 
-<a href="{{ route('artists.show', $artist) }}" class="group block rounded-lg border border-black/10 bg-surface p-4 transition hover:border-black/20 hover:bg-black/10">
-    <div class="aspect-square w-full overflow-hidden rounded-md bg-black/10">
+<a href="{{ route('artists.show', $artist) }}" class="group block rounded-lg border border-white/10 bg-surface p-4 transition hover:border-white/20 hover:bg-white/10">
+    <div class="aspect-square w-full overflow-hidden rounded-md bg-white/10">
         @if ($artist->image)
             <img src="{{ $artist->image }}" alt="{{ $artist->name }}" class="h-full w-full object-cover" loading="lazy">
         @else

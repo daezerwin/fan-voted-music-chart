@@ -9,7 +9,7 @@
                 value="{{ $query }}"
                 placeholder="Search artists and songs"
                 autofocus
-                class="w-full rounded-lg border border-black/10 bg-surface px-4 py-3 text-ink placeholder-muted focus:border-primary focus:outline-none"
+                class="w-full rounded-lg border border-white/10 bg-surface px-4 py-3 text-ink placeholder-muted focus:border-primary focus:outline-none"
             >
         </form>
 

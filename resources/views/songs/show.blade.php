@@ -6,7 +6,7 @@
 >
     <div class="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
         @if (session('status'))
-            <p class="mb-6 rounded-lg border border-success/30 bg-success/10 px-4 py-3 text-sm text-ink">
+            <p class="mb-6 rounded-lg border border-success/30 bg-success/10 px-4 py-3 text-sm text-success">
                 {{ session('status') }}
             </p>
         @endif
@@ -55,7 +55,7 @@
 
                     <a
                         href="{{ $nextSongUrl ?? route('shuffle.all') }}"
-                        class="rounded-lg border border-black/10 px-4 py-2 text-sm font-medium text-muted hover:border-black/20 hover:text-ink"
+                        class="rounded-lg border border-white/10 px-4 py-2 text-sm font-medium text-muted hover:border-white/20 hover:text-ink"
                     >
                         Next
                     </a>
