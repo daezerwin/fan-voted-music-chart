@@ -54,6 +54,7 @@
                     <a href="{{ route('charts.daily') }}" class="hover:text-white">Charts</a>
                     <a href="{{ route('artists.index') }}" class="hover:text-white">Artists</a>
                     <a href="{{ route('genres.index') }}" class="hover:text-white">Genres</a>
+                    <a href="{{ route('shuffle.all') }}" class="hover:text-white">Shuffle</a>
 
                     @auth
                         <span class="text-neutral-400">{{ auth()->user()->name }}</span>

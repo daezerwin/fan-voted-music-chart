@@ -35,7 +35,15 @@
             </div>
         </div>
 
-        <h2 class="mt-12 text-lg font-semibold text-white">Songs</h2>
+        <div class="mt-12 flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-white">Songs</h2>
+
+            @if ($songs->isNotEmpty())
+                <a href="{{ route('artists.shuffle', $artist) }}" class="text-sm font-medium text-neutral-300 hover:text-white">
+                    Shuffle
+                </a>
+            @endif
+        </div>
 
         @if ($songs->isEmpty())
             <x-empty-state message="No songs yet." class="mt-4" />

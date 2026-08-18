@@ -14,6 +14,7 @@ use App\Http\Controllers\ChartController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\ShuffleController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SongController;
 use App\Http\Controllers\TopTenPlayerController;
@@ -34,11 +35,15 @@ Route::get('/play', [TopTenPlayerController::class, 'show'])->name('play');
 
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
+Route::get('/shuffle', [ShuffleController::class, 'all'])->name('shuffle.all');
+
 Route::get('/artists', [ArtistController::class, 'index'])->name('artists.index');
 Route::get('/artists/{artist:slug}', [ArtistController::class, 'show'])->name('artists.show');
+Route::get('/artists/{artist:slug}/shuffle', [ShuffleController::class, 'forArtist'])->name('artists.shuffle');
 
 Route::get('/genres', [GenreController::class, 'index'])->name('genres.index');
 Route::get('/genres/{genre:slug}', [GenreController::class, 'show'])->name('genres.show');
+Route::get('/genres/{genre:slug}/shuffle', [ShuffleController::class, 'forGenre'])->name('genres.shuffle');
 
 Route::get('/songs/{song:slug}', [SongController::class, 'show'])->name('songs.show');
 

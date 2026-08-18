@@ -129,6 +129,105 @@ class CuratedSongSeeder extends Seeder
             ['title' => 'Swish Swish', 'date' => '2017-05-19', 'youtube' => 'iGk5fR-t5AU', 'genre' => 'Pop'],
             ['title' => 'Never Really Over', 'date' => '2019-05-31', 'youtube' => 'aEb5gNsmGJ8', 'genre' => 'Pop'],
         ],
+        'Taylor Swift' => [
+            ['title' => 'Love Story', 'date' => '2008-09-15', 'youtube' => '8xg3vE8Ie_E', 'genre' => 'Country'],
+            ['title' => 'You Belong with Me', 'date' => '2009-04-20', 'youtube' => 'VuNIsY6JdUw', 'genre' => 'Country'],
+            ['title' => 'Mean', 'date' => '2011-03-07', 'youtube' => 'jYa1eI1hpDE', 'genre' => 'Country'],
+            ['title' => 'I Knew You Were Trouble', 'date' => '2012-10-09', 'youtube' => 'vNoKguSdy4Y', 'genre' => 'Pop'],
+            ['title' => '22', 'date' => '2013-03-12', 'youtube' => 'AgFeZr5ptV8', 'genre' => 'Pop'],
+            ['title' => 'Style', 'date' => '2015-02-09', 'youtube' => '-CmadmM5cOk', 'genre' => 'Pop'],
+            ['title' => 'Shake It Off', 'date' => '2014-08-18', 'youtube' => 'nfWlot6h_JM', 'genre' => 'Pop'],
+            ['title' => 'Blank Space', 'date' => '2014-11-10', 'youtube' => 'e-ORhEE9VVg', 'genre' => 'Pop'],
+            ['title' => 'Bad Blood', 'date' => '2015-05-17', 'youtube' => 'QcIy9NiNbmo', 'genre' => 'Pop'],
+            ['title' => 'Wildest Dreams', 'date' => '2015-08-31', 'youtube' => 'IdneKLhsWOQ', 'genre' => 'Pop'],
+            ['title' => 'Look What You Made Me Do', 'date' => '2017-08-24', 'youtube' => '3tmd-ClpJxA', 'genre' => 'Pop'],
+            ['title' => 'Delicate', 'date' => '2018-03-12', 'youtube' => 'tCXGJQYZ9JA', 'genre' => 'Pop'],
+            ['title' => 'ME!', 'date' => '2019-04-26', 'youtube' => 'FuXNumBwDOM', 'genre' => 'Pop'],
+            ['title' => 'Lover', 'date' => '2019-08-16', 'youtube' => '-BjZmE2gtdo', 'genre' => 'Pop'],
+            ['title' => 'cardigan', 'date' => '2020-07-24', 'youtube' => 'K-a8s8OLBSE', 'genre' => 'Indie'],
+            ['title' => 'willow', 'date' => '2020-12-11', 'youtube' => 'RsEZmictANA', 'genre' => 'Indie'],
+            ['title' => 'Anti-Hero', 'date' => '2022-10-21', 'youtube' => 'b1kbLwvqugk', 'genre' => 'Pop'],
+        ],
+        'The Red Jumpsuit Apparatus' => [
+            ['title' => 'Face Down', 'date' => '2006-01-01', 'youtube' => '6Ux6SlOE9Qk', 'genre' => 'Rock'],
+            ['title' => 'Your Guardian Angel', 'date' => '2007-01-01', 'youtube' => 'Q7Em4fUOrZo', 'genre' => 'Rock'],
+            ['title' => 'False Pretense', 'date' => '2007-01-01', 'youtube' => 'MiCZdvQXULE', 'genre' => 'Rock'],
+            ['title' => 'Damn Regret', 'date' => '2008-01-01', 'youtube' => 'a0jepTxxWMs', 'genre' => 'Rock'],
+        ],
+        'David Cook' => [
+            ['title' => 'Light On', 'date' => '2008-01-01', 'youtube' => '4i8ZCp3-n7w', 'genre' => 'Rock'],
+            ['title' => 'Come Back to Me', 'date' => '2009-01-01', 'youtube' => 'XBF6IV8W-80', 'genre' => 'Rock'],
+            ['title' => 'Fade Into Me', 'date' => '2011-01-01', 'youtube' => 'EJp8NZFwCEU', 'genre' => 'Rock'],
+            ['title' => 'The Last Goodbye', 'date' => '2011-01-01', 'youtube' => 'F4VyubKgRG8', 'genre' => 'Rock'],
+            ['title' => 'Criminals', 'date' => '2015-01-01', 'youtube' => 'LnxOnXvF6JM', 'genre' => 'Rock'],
+        ],
+        'Daughtry' => [
+            ['title' => "It's Not Over", 'date' => '2006-01-01', 'youtube' => 'UQ92eyxnxmQ', 'genre' => 'Rock'],
+            ['title' => 'Home', 'date' => '2007-01-01', 'youtube' => '7bnX-6sJZBw', 'genre' => 'Rock'],
+            ['title' => 'Over You', 'date' => '2007-01-01', 'youtube' => 'm02-RHN_hQE', 'genre' => 'Rock'],
+            ['title' => 'What About Now', 'date' => '2008-01-01', 'youtube' => 'roDXSHSEuoo', 'genre' => 'Rock'],
+            ['title' => 'No Surprise', 'date' => '2009-01-01', 'youtube' => 'jNwENsRgC0o', 'genre' => 'Rock'],
+            ['title' => 'Start of Something Good', 'date' => '2012-01-01', 'youtube' => 'WKsyxZWQ_g0', 'genre' => 'Rock'],
+            ['title' => 'Waiting for Superman', 'date' => '2013-01-01', 'youtube' => 'SXjXKT98esw', 'genre' => 'Rock'],
+            ['title' => 'Separate Ways (Worlds Apart)', 'date' => '2023-01-01', 'youtube' => 'I9iXHAgjXhA', 'genre' => 'Rock'],
+            ['title' => 'Pieces', 'date' => '2024-01-01', 'youtube' => 'ORbAJF2nhKI', 'genre' => 'Rock'],
+        ],
+        'The Script' => [
+            ['title' => "The Man Who Can't Be Moved", 'date' => '2008-01-01', 'youtube' => 'gS9o1FAszdk', 'genre' => 'Pop'],
+            ['title' => 'Breakeven', 'date' => '2008-01-01', 'youtube' => 'MzCLLHscMOw', 'genre' => 'Pop'],
+            ['title' => 'For the First Time', 'date' => '2010-01-01', 'youtube' => '3DTQsJ6ZaOQ', 'genre' => 'Pop'],
+            ['title' => 'Six Degrees of Separation', 'date' => '2012-01-01', 'youtube' => 'FCT6Mu-pOeE', 'genre' => 'Pop'],
+            ['title' => 'Hall of Fame', 'date' => '2012-01-01', 'youtube' => 'mk48xRzuNvA', 'genre' => 'Pop'],
+            ['title' => 'Millionaires', 'date' => '2013-01-01', 'youtube' => 'gV1-M4uRiiw', 'genre' => 'Pop'],
+            ['title' => 'If You Could See Me Now', 'date' => '2013-01-01', 'youtube' => 'SGlkwKA-t_4', 'genre' => 'Pop'],
+            ['title' => 'Superheroes', 'date' => '2014-01-01', 'youtube' => 'WIm1GgfRz6M', 'genre' => 'Pop'],
+            ['title' => 'No Good in Goodbye', 'date' => '2014-01-01', 'youtube' => 'ho9xM9n2USA', 'genre' => 'Pop'],
+        ],
+        'Whitney Houston' => [
+            ['title' => 'I Will Always Love You', 'date' => '1992-11-02', 'youtube' => '3JWTaaS7LdU', 'genre' => 'R&B'],
+        ],
+        'Celine Dion' => [
+            ['title' => 'My Heart Will Go On', 'date' => '1997-11-24', 'youtube' => '9bFHsd3o1w0', 'genre' => 'Pop'],
+        ],
+        'Mariah Carey' => [
+            ['title' => 'Hero', 'date' => '1993-10-18', 'youtube' => '0IA3ZvCkRkQ', 'genre' => 'Pop'],
+        ],
+        'Boyz II Men' => [
+            ['title' => 'End of the Road', 'date' => '1992-06-30', 'youtube' => 'zDKO6XYXioc', 'genre' => 'R&B'],
+        ],
+        'Toni Braxton' => [
+            ['title' => 'Un-Break My Heart', 'date' => '1996-10-07', 'youtube' => 'p2Rch6WvPJE', 'genre' => 'R&B'],
+        ],
+        'Bryan Adams' => [
+            ['title' => '(Everything I Do) I Do It for You', 'date' => '1991-06-17', 'youtube' => 'Y0pdQU87dc8', 'genre' => 'Rock'],
+        ],
+        'Extreme' => [
+            ['title' => 'More Than Words', 'date' => '1991-03-12', 'youtube' => 'UrIiLvg58SY', 'genre' => 'Rock'],
+        ],
+        'Roxette' => [
+            ['title' => 'It Must Have Been Love', 'date' => '1990-01-01', 'youtube' => 'k2C5TjS2sh4', 'genre' => 'Pop'],
+        ],
+        'Berlin' => [
+            ['title' => 'Take My Breath Away', 'date' => '1986-01-01', 'youtube' => 'Bx51eegLTY8', 'genre' => 'Pop'],
+        ],
+        'Foreigner' => [
+            ['title' => 'I Want to Know What Love Is', 'date' => '1984-11-21', 'youtube' => 'r3Pr1_v7hsw', 'genre' => 'Rock'],
+        ],
+        'Richard Marx' => [
+            ['title' => 'Right Here Waiting', 'date' => '1989-06-21', 'youtube' => 'S_E2EHVxNAE', 'genre' => 'Pop'],
+        ],
+        'Bonnie Tyler' => [
+            ['title' => 'Total Eclipse of the Heart', 'date' => '1983-01-01', 'youtube' => 'lcOxhH8N3Bo', 'genre' => 'Rock'],
+        ],
+        'Sade' => [
+            ['title' => 'No Ordinary Love', 'date' => '1992-09-01', 'youtube' => '_WcWHZc8s2I', 'genre' => 'R&B'],
+        ],
+        'Shania Twain' => [
+            ['title' => "You're Still the One", 'date' => '1998-01-13', 'youtube' => 'KNZH-emehxA', 'genre' => 'Country'],
+        ],
+        'Vanessa Williams' => [
+            ['title' => 'Save the Best for Last', 'date' => '1992-01-14', 'youtube' => '5EdmHSTwmWY', 'genre' => 'R&B'],
+        ],
     ];
 
     public function run(): void
@@ -153,7 +252,12 @@ class CuratedSongSeeder extends Seeder
                         'artist_id' => $artist->id,
                         'genre_id' => $genre->id,
                         'title' => $song['title'],
-                        'slug' => Str::slug($song['title']),
+                        // Artist-prefixed to avoid colliding with a same-titled
+                        // song by a different artist (e.g. "Home" exists for
+                        // both Westlife and Daughtry). Existing rows keep
+                        // whatever slug they were created with, since this
+                        // only affects new inserts.
+                        'slug' => Str::slug($artistName.' '.$song['title']),
                         'release_date' => $song['date'],
                         'is_active' => true,
                         'voting_enabled' => true,

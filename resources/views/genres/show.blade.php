@@ -6,7 +6,15 @@
             @include('partials.discovery-sections')
         </div>
 
-        <h2 class="mt-12 text-lg font-semibold text-white">All Songs</h2>
+        <div class="mt-12 flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-white">All Songs</h2>
+
+            @if ($songs->isNotEmpty())
+                <a href="{{ route('genres.shuffle', $genre) }}" class="text-sm font-medium text-neutral-300 hover:text-white">
+                    Shuffle
+                </a>
+            @endif
+        </div>
 
         @if ($songs->isEmpty())
             <x-empty-state message="No songs in this genre yet." class="mt-6" />

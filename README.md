@@ -223,6 +223,18 @@ scoped to a genre):
 All three degrade to an empty-state message when there's no data yet (e.g. a fresh install with no
 votes or no chart generated), rather than a broken or misleadingly empty-looking section.
 
+## Shuffle
+
+`App\Actions\Songs\GetRandomSong` picks a random active song via `inRandomOrder()`, optionally scoped
+to one artist or genre. Three routes redirect straight to a random song's page:
+
+* `GET /shuffle` — any active song, site-wide (linked from the main nav).
+* `GET /artists/{artist}/shuffle` — random song by that artist.
+* `GET /genres/{genre}/shuffle` — random song in that genre.
+
+All three exclude inactive songs (and songs by an inactive artist), matching the same eligibility rule
+used everywhere else in the catalog.
+
 ## YouTube Integration
 
 Individual song pages use a standard official `<iframe>` embed (`youtube.com/embed/{video_id}`) — no
@@ -262,9 +274,11 @@ docker compose exec app php artisan db:seed --class=GenreSeeder --force
 docker compose exec app php artisan db:seed --class=CuratedArtistSeeder --force
 docker compose exec app php artisan db:seed --class=CuratedSongSeeder --force
 ```
-`CuratedArtistSeeder` adds 7 real artists (Hale, Cueshe, Shamrock, Maroon 5, Backstreet Boys, Westlife,
-Katy Perry) and `CuratedSongSeeder` adds ~94 of their songs, each pointing at a verified official-channel
-YouTube music video — run the artist seeder first.
+`CuratedArtistSeeder` adds 27 real artists — Hale, Cueshe, Shamrock, Maroon 5, Backstreet Boys, Westlife,
+Katy Perry, Taylor Swift, The Red Jumpsuit Apparatus, David Cook, Daughtry, The Script, and 15 more behind
+classic '80s/'90s love songs (Whitney Houston, Celine Dion, Bryan Adams, etc.) — and `CuratedSongSeeder`
+adds over 200 of their songs, each pointing at a verified official-channel YouTube music video. Run the
+artist seeder first.
 
 To populate the catalog from the admin UI, create **genres and artists first** — the song form requires
 picking an existing artist and genre, so there's nothing to attach a song to until those exist:
