@@ -1,11 +1,11 @@
 @props(['entry'])
 
 @if ($entry->isNewEntry())
-    <span class="text-xs font-semibold text-sky-400">NEW</span>
+    <span class="text-xs font-semibold text-accent">NEW</span>
 @elseif ($entry->isReentry())
-    <span class="text-xs font-semibold text-purple-400">RE-ENTRY</span>
+    <span class="text-xs font-semibold text-primary">RE-ENTRY</span>
 @elseif ($entry->movement > 0)
-    <span class="inline-flex items-center gap-0.5 text-xs font-semibold text-emerald-400">
+    <span class="inline-flex items-center gap-0.5 text-xs font-semibold text-success">
         <span aria-hidden="true">▲</span>{{ $entry->movement }}
     </span>
 @elseif ($entry->movement < 0)
@@ -13,7 +13,7 @@
         <span aria-hidden="true">▼</span>{{ abs($entry->movement) }}
     </span>
 @else
-    <span class="text-xs font-semibold text-neutral-500">
+    <span class="text-xs font-semibold text-muted">
         <span aria-hidden="true">—</span>
         <span class="sr-only">No change</span>
     </span>

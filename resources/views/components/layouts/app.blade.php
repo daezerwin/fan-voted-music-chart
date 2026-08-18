@@ -30,11 +30,11 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="h-full bg-neutral-950 text-neutral-100 antialiased">
+<body class="h-full bg-background text-ink antialiased">
     <div class="flex min-h-full flex-col">
-        <header class="border-b border-white/10 bg-neutral-950/80 backdrop-blur">
+        <header class="border-b border-white/10 bg-background/80 backdrop-blur">
             <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8" aria-label="Primary">
-                <a href="{{ url('/') }}" class="text-lg font-semibold tracking-tight text-white">
+                <a href="{{ url('/') }}" class="text-lg font-semibold tracking-tight text-ink">
                     {{ config('app.name') }}
                 </a>
 
@@ -46,25 +46,25 @@
                         name="q"
                         value="{{ request('q') }}"
                         placeholder="Search artists and songs"
-                        class="w-full rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm text-white placeholder-neutral-500 focus:border-blue-500 focus:outline-none"
+                        class="w-full rounded-full border border-white/10 bg-surface px-4 py-1.5 text-sm text-ink placeholder-muted focus:border-primary focus:outline-none"
                     >
                 </form>
 
-                <div class="flex items-center gap-6 text-sm font-medium text-neutral-300">
-                    <a href="{{ route('charts.daily') }}" class="hover:text-white">Charts</a>
-                    <a href="{{ route('artists.index') }}" class="hover:text-white">Artists</a>
-                    <a href="{{ route('genres.index') }}" class="hover:text-white">Genres</a>
-                    <a href="{{ route('shuffle.all') }}" class="hover:text-white">Shuffle</a>
+                <div class="flex items-center gap-6 text-sm font-medium text-muted">
+                    <a href="{{ route('charts.daily') }}" class="hover:text-ink">Charts</a>
+                    <a href="{{ route('artists.index') }}" class="hover:text-ink">Artists</a>
+                    <a href="{{ route('genres.index') }}" class="hover:text-ink">Genres</a>
+                    <a href="{{ route('shuffle.all') }}" class="hover:text-ink">Shuffle</a>
 
                     @auth
-                        <span class="text-neutral-400">{{ auth()->user()->name }}</span>
+                        <span class="text-muted">{{ auth()->user()->name }}</span>
                         <form action="{{ route('logout') }}" method="POST">
                             @csrf
-                            <button type="submit" class="hover:text-white">Sign Out</button>
+                            <button type="submit" class="hover:text-ink">Sign Out</button>
                         </form>
                     @else
-                        <a href="{{ route('login') }}" class="hover:text-white">Sign In</a>
-                        <a href="{{ route('register') }}" class="rounded-lg bg-blue-700 px-3 py-1.5 text-white hover:bg-blue-600">Sign Up</a>
+                        <a href="{{ route('login') }}" class="hover:text-ink">Sign In</a>
+                        <a href="{{ route('register') }}" class="rounded-lg bg-primary px-3 py-1.5 text-ink hover:bg-primary/90">Sign Up</a>
                     @endauth
                 </div>
             </nav>
@@ -75,7 +75,7 @@
         </main>
 
         <footer class="border-t border-white/10">
-            <div class="mx-auto max-w-6xl px-4 py-8 text-sm text-neutral-500 sm:px-6 lg:px-8">
+            <div class="mx-auto max-w-6xl px-4 py-8 text-sm text-muted sm:px-6 lg:px-8">
                 <p>{{ config('app.name') }} is an independent, community-driven music chart. Not affiliated with Billboard.</p>
             </div>
         </footer>

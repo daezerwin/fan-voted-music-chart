@@ -6,6 +6,16 @@
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* Site color scheme — see each role's use below. */
+    --color-background: #0b1020; /* Background */
+    --color-surface: #171b35; /* Surface / Cards */
+    --color-primary: #8b5cf6; /* Primary */
+    --color-accent: #f43f8c; /* Accent */
+    --color-highlight: #22d3ee; /* Highlight / Winner */
+    --color-success: #a3e635; /* Vote / Success */
+    --color-ink: #f8fafc; /* Main Text */
+    --color-muted: #a8b0c5; /* Secondary Text */
 }
 
 /*
@@ -20,7 +30,7 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 [tabindex]:focus-visible {
-    outline: 2px solid #3b82f6;
+    outline: 2px solid #8b5cf6;
     outline-offset: 2px;
     border-radius: 2px;
 }

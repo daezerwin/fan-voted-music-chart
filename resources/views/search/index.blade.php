@@ -9,14 +9,14 @@
                 value="{{ $query }}"
                 placeholder="Search artists and songs"
                 autofocus
-                class="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-neutral-500 focus:border-blue-500 focus:outline-none"
+                class="w-full rounded-lg border border-white/10 bg-surface px-4 py-3 text-ink placeholder-muted focus:border-primary focus:outline-none"
             >
         </form>
 
         @if ($query === '')
-            <p class="mt-8 text-neutral-500">Start typing to search artists and songs.</p>
+            <p class="mt-8 text-muted">Start typing to search artists and songs.</p>
         @else
-            <h2 class="mt-8 text-lg font-semibold text-white">Artists</h2>
+            <h2 class="mt-8 text-lg font-semibold text-ink">Artists</h2>
             @if ($artists->isEmpty())
                 <x-empty-state message="No matching artists." class="mt-4" />
             @else
@@ -27,7 +27,7 @@
                 </div>
             @endif
 
-            <h2 class="mt-10 text-lg font-semibold text-white">Songs</h2>
+            <h2 class="mt-10 text-lg font-semibold text-ink">Songs</h2>
             @if ($songs->isEmpty())
                 <x-empty-state message="No matching songs." class="mt-4" />
             @else

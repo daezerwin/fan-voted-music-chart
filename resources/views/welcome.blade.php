@@ -1,9 +1,9 @@
 <x-layouts.app>
     <div class="mx-auto max-w-6xl px-4 py-16 text-center sm:px-6 lg:px-8">
-        <h1 class="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+        <h1 class="text-4xl font-bold tracking-tight text-ink sm:text-5xl">
             {{ config('app.name') }}
         </h1>
-        <p class="mx-auto mt-4 max-w-2xl text-lg text-neutral-400">
+        <p class="mx-auto mt-4 max-w-2xl text-lg text-muted">
             A fan-voted music chart built by the community, for the community. Discover trending songs,
             vote for your favorites, and watch the daily chart move.
         </p>
@@ -12,10 +12,10 @@
     @if ($topTen && $topTen->entries->isNotEmpty())
         <div class="mx-auto max-w-3xl px-4 pb-16 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between">
-                <h2 class="text-lg font-semibold text-white">Current Top 10</h2>
+                <h2 class="text-lg font-semibold text-ink">Current Top 10</h2>
                 <div class="flex items-center gap-4">
-                    <a href="{{ route('play') }}" class="text-sm text-neutral-400 hover:text-white">▶ Play Top 10</a>
-                    <a href="{{ route('charts.daily') }}" class="text-sm text-neutral-400 hover:text-white">Full chart →</a>
+                    <a href="{{ route('play') }}" class="text-sm text-muted hover:text-ink">▶ Play Top 10</a>
+                    <a href="{{ route('charts.daily') }}" class="text-sm text-muted hover:text-ink">Full chart →</a>
                 </div>
             </div>
 
@@ -33,8 +33,8 @@
 
     <div class="mx-auto max-w-6xl px-4 pb-16 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-white">Recently Added</h2>
-            <a href="{{ route('genres.index') }}" class="text-sm text-neutral-400 hover:text-white">Browse genres →</a>
+            <h2 class="text-lg font-semibold text-ink">Recently Added</h2>
+            <a href="{{ route('genres.index') }}" class="text-sm text-muted hover:text-ink">Browse genres →</a>
         </div>
 
         @if ($recentSongs->isEmpty())
@@ -50,8 +50,8 @@
 
     <div class="mx-auto max-w-6xl px-4 pb-24 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-white">Artists</h2>
-            <a href="{{ route('artists.index') }}" class="text-sm text-neutral-400 hover:text-white">Browse all artists →</a>
+            <h2 class="text-lg font-semibold text-ink">Artists</h2>
+            <a href="{{ route('artists.index') }}" class="text-sm text-muted hover:text-ink">Browse all artists →</a>
         </div>
 
         @if ($featuredArtists->isEmpty())

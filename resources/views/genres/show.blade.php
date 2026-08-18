@@ -1,16 +1,16 @@
 <x-layouts.app :title="$genre->name.' — '.config('app.name')" :description="'Songs in the '.$genre->name.' genre.'">
     <div class="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
-        <h1 class="text-2xl font-semibold text-white">{{ $genre->name }}</h1>
+        <h1 class="text-2xl font-semibold text-ink">{{ $genre->name }}</h1>
 
         <div class="mt-8">
             @include('partials.discovery-sections')
         </div>
 
         <div class="mt-12 flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-white">All Songs</h2>
+            <h2 class="text-lg font-semibold text-ink">All Songs</h2>
 
             @if ($songs->isNotEmpty())
-                <a href="{{ route('genres.shuffle', $genre) }}" class="text-sm font-medium text-neutral-300 hover:text-white">
+                <a href="{{ route('genres.shuffle', $genre) }}" class="text-sm font-medium text-muted hover:text-ink">
                     Shuffle
                 </a>
             @endif

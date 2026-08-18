@@ -1,6 +1,6 @@
 <x-layouts.app :title="'Artists — '.config('app.name')" description="Browse artists on the chart.">
     <div class="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
-        <h1 class="text-2xl font-semibold text-white">Artists</h1>
+        <h1 class="text-2xl font-semibold text-ink">Artists</h1>
 
         @if ($artists->isEmpty())
             <x-empty-state message="No artists yet." class="mt-6" />

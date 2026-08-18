@@ -2,23 +2,23 @@
 
 @auth
     @if (! $song->voting_enabled)
-        <button type="button" disabled {{ $attributes->merge(['class' => 'inline-flex items-center justify-center rounded-lg bg-white/10 px-5 py-2.5 font-medium text-neutral-500 cursor-not-allowed']) }}>
+        <button type="button" disabled {{ $attributes->merge(['class' => 'inline-flex items-center justify-center rounded-lg bg-white/10 px-5 py-2.5 font-medium text-muted cursor-not-allowed']) }}>
             Voting Closed
         </button>
     @elseif ($hasVoted)
-        <button type="button" disabled {{ $attributes->merge(['class' => 'inline-flex items-center justify-center rounded-lg bg-emerald-500/20 px-5 py-2.5 font-medium text-emerald-300 cursor-default']) }}>
+        <button type="button" disabled {{ $attributes->merge(['class' => 'inline-flex items-center justify-center rounded-lg bg-success/20 px-5 py-2.5 font-medium text-success cursor-default']) }}>
             Voted Today
         </button>
     @else
         <form action="{{ route('votes.store', $song) }}" method="POST">
             @csrf
-            <button type="submit" {{ $attributes->merge(['class' => 'inline-flex items-center justify-center rounded-lg bg-blue-700 px-5 py-2.5 font-medium text-white hover:bg-blue-600']) }}>
+            <button type="submit" {{ $attributes->merge(['class' => 'inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2.5 font-medium text-ink hover:bg-primary/90']) }}>
                 Vote
             </button>
         </form>
     @endif
 @else
-    <a href="{{ route('login') }}" {{ $attributes->merge(['class' => 'inline-flex items-center justify-center rounded-lg bg-blue-700 px-5 py-2.5 font-medium text-white hover:bg-blue-600']) }}>
+    <a href="{{ route('login') }}" {{ $attributes->merge(['class' => 'inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2.5 font-medium text-ink hover:bg-primary/90']) }}>
         Sign In to Vote
     </a>
 @endauth

@@ -1,6 +1,6 @@
 <x-layouts.app :title="'Genres — '.config('app.name')" description="Browse songs by genre.">
     <div class="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
-        <h1 class="text-2xl font-semibold text-white">Genres</h1>
+        <h1 class="text-2xl font-semibold text-ink">Genres</h1>
 
         @if ($genres->isEmpty())
             <x-empty-state message="No genres yet." class="mt-6" />
